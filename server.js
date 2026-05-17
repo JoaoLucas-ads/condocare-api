@@ -218,24 +218,7 @@ app.get("/historico/:id_chamado", async (req, res) => {
   }
 });
 
-app.get("/limpar-banco-temporario", async (req, res) => {
-  try {
-    await prisma.historicoChamado.deleteMany();
-    await prisma.materialChamado.deleteMany();
-    await prisma.chamado.deleteMany();
-    await prisma.usuario.deleteMany();
-    await prisma.unidade.deleteMany();
 
-    res.json({
-      mensagem: "Banco limpo com sucesso"
-    });
-  } catch (error) {
-    res.status(500).json({
-      mensagem: "Erro ao limpar banco",
-      erro: error
-    });
-  }
-});
 
 const PORT = process.env.PORT || 3000;
 
