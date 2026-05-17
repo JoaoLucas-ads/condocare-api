@@ -218,6 +218,25 @@ app.get("/historico/:id_chamado", async (req, res) => {
   }
 });
 
+app.get("/limpar-usuarios-temporario", async (req, res) => {
+  try {
+    await prisma.historicoChamado.deleteMany();
+    await prisma.chamado.deleteMany();
+    await prisma.unidade.deleteMany();
+    await prisma.usuario.deleteMany();
+
+    res.json({
+      mensagem: "Usuários e dados relacionados apagados com sucesso"
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      mensagem: "Erro ao apagar usuários",
+      erro: error
+    });
+  }
+});
 
 
 const PORT = process.env.PORT || 3000;
