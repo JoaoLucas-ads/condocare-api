@@ -9,7 +9,7 @@ app.use(cors());
 app.use(express.json());
 
 const adapter = new PrismaBetterSqlite3({
-  url: "file:./dev.db"
+  url: process.env.DATABASE_URL || "file:./dev.db"
 });
 
 const prisma = new PrismaClient({
