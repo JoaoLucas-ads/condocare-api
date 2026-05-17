@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 import 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { corStatus } from './utils/status';
+import { corStatus } from './utils/status.js';
 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Vibration } from 'react-native';
