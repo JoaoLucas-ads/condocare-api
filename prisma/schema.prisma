@@ -1,0 +1,168 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+enum TipoPerfil {
+  Administrador
+  Sindico
+  Morador
+  Tecnico
+}
+
+enum SubtipoMorador {
+  Proprietario
+  Locatario
+  Dependente
+}
+
+enum FrequenciaVisita {
+  Diario
+  Semanal
+  Quinzenal
+  Mensal
+}
+
+enum StatusChamado {
+  Aberto
+  EmAtendimento
+  Reagendado
+  Finalizado
+  Cancelado
+}
+
+enum StatusMaterial {
+  Solicitado
+  Aprovado
+  Comprado
+  Utilizado
+}
+
+model Unidade {
+  id_unidade          Int       @id @default(autoincrement())
+  bloco               String?
+  numero_apartamento  String
+  id_responsavel      Int?
+
+  responsavel         Usuario?  @relation("ResponsavelUnidade", fields: [id_responsavel], references: [id_usuario])
+  moradores           Usuario[] @relation("UsuarioUnidade")
+  chamados            Chamado[]
+
+  created_at          DateTime  @default(now())
+
+  @@map("unidades")
+}
+
+model Usuario {
+  id_usuario       Int              @id @default(autoincrement())
+  nome             String
+  email            String           @unique
+  telefone         String?
+  senha            String
+
+  tipo_perfil      TipoPerfil
+  subtipo_morador  SubtipoMorador?
+
+  id_unidade       Int?
+  id_empresa       Int?
+
+  unidade          Unidade?         @relation("UsuarioUnidade", fields: [id_unidade], references: [id_unidade])
+  empresa          EmpresaPrestadora? @relation(fields: [id_empresa], references: [id_empresa])
+
+  unidades_responsavel Unidade[]    @relation("ResponsavelUnidade")
+  chamados_abertos     Chamado[]    @relation("SolicitanteChamado")
+  chamados_executados  Chamado[]    @relation("TecnicoChamado")
+  historicos           HistoricoChamado[]
+
+  created_at       DateTime         @default(now())
+
+  @@map("usuarios")
+}
+
+model EmpresaPrestadora {
+  id_empresa        Int              @id @default(autoincrement())
+  nome_fantasia     String
+  cnpj              String?          @unique
+  frequencia_visita FrequenciaVisita
+  especialidade     String
+  telefone          String?
+  email             String?
+
+  tecnicos          Usuario[]
+  chamados          Chamado[]
+
+  created_at        DateTime         @default(now())
+
+  @@map("empresas_prestadoras")
+}
+
+model Chamado {
+  id_chamado              Int           @id @default(autoincrement())
+
+  id_unidade              Int
+  id_solicitante          Int
+  id_empresa_designada    Int?
+  id_tecnico_executor     Int?
+
+  status                  StatusChamado @default(Aberto)
+
+  descricao_problema      String
+  laudo_tecnico           String?
+  observacoes             String?
+
+  data_abertura           DateTime      @default(now())
+  data_inicio_atendimento DateTime?
+  data_fim_atendimento    DateTime?
+  data_reagendamento      DateTime?
+  data_finalizacao        DateTime?
+
+  unidade                 Unidade       @relation(fields: [id_unidade], references: [id_unidade])
+  solicitante             Usuario       @relation("SolicitanteChamado", fields: [id_solicitante], references: [id_usuario])
+  empresa_designada       EmpresaPrestadora? @relation(fields: [id_empresa_designada], references: [id_empresa])
+  tecnico_executor        Usuario?      @relation("TecnicoChamado", fields: [id_tecnico_executor], references: [id_usuario])
+
+  historicos              HistoricoChamado[]
+  materiais               MaterialChamado[]
+
+  created_at              DateTime      @default(now())
+  updated_at              DateTime      @updatedAt
+
+  @@map("chamados")
+}
+
+model HistoricoChamado {
+  id_historico     Int      @id @default(autoincrement())
+
+  id_chamado       Int
+  id_usuario       Int
+
+  acao             String
+  status_anterior  String?
+  status_novo      String?
+  descricao        String?
+
+  chamado          Chamado  @relation(fields: [id_chamado], references: [id_chamado])
+  usuario          Usuario  @relation(fields: [id_usuario], references: [id_usuario])
+
+  data_acao        DateTime @default(now())
+
+  @@map("historico_chamados")
+}
+
+model MaterialChamado {
+  id_material        Int            @id @default(autoincrement())
+
+  id_chamado         Int
+  descricao_material String
+  quantidade         Int            @default(1)
+  status_material    StatusMaterial @default(Solicitado)
+
+  chamado            Chamado        @relation(fields: [id_chamado], references: [id_chamado])
+
+  created_at         DateTime       @default(now())
+
+  @@map("materiais_chamado")
+}
