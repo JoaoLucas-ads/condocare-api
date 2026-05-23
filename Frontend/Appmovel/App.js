@@ -998,26 +998,6 @@ options={{title:'Chamados,'}}
   );
 }
 
-function SairScreen({ route }) {
-
-  async function sair() {
-    await AsyncStorage.removeItem("usuarioLogado");
-
-    route.params.funcLogout(false);
-  }
-
-  useEffect(() => {
-    sair();
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.screenTitle}>
-        Saindo...
-      </Text>
-    </View>
-  );
-}
 
 
 function DrawerNavigator({ funcLogout }) {
