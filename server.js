@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const bcrypt = require("bcrypt");
 const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
@@ -16,10 +17,7 @@ const pool = new Pool({
 });
 
 const adapter = new PrismaPg(pool);
-
 const prisma = new PrismaClient({ adapter });
-
-// resto do seu código continua igual
 
 app.get("/", (req, res) => {
   res.send("CondoCare API funcionando");
@@ -39,14 +37,7 @@ app.get("/usuarios", async (req, res) => {
 
 app.post("/usuarios", async (req, res) => {
   try {
-    const {
-      nome,
-      email,
-      telefone,
-      senha,
-      tipo_perfil,
-      subtipo_morador
-    } = req.body;
+    const { nome, email, telefone, senha, tipo_perfil, subtipo_morador } = req.body;
 
     if (!nome || !email || !senha) {
       return res.status(400).json({
@@ -54,12 +45,24 @@ app.post("/usuarios", async (req, res) => {
       });
     }
 
+    const usuarioExistente = await prisma.usuario.findUnique({
+      where: { email }
+    });
+
+    if (usuarioExistente) {
+      return res.status(400).json({
+        mensagem: "Este e-mail já está cadastrado."
+      });
+    }
+
+    const senhaCriptografada = await bcrypt.hash(senha, 10);
+
     const usuario = await prisma.usuario.create({
       data: {
         nome,
         email,
         telefone,
-        senha,
+        senha: senhaCriptografada,
         tipo_perfil: tipo_perfil || "Morador",
         subtipo_morador: subtipo_morador || "Proprietario"
       }
@@ -81,14 +84,25 @@ app.post("/login", async (req, res) => {
   try {
     const { email, senha } = req.body;
 
-    const usuario = await prisma.usuario.findFirst({
-      where: {
-        email,
-        senha
-      }
+    if (!email || !senha) {
+      return res.status(400).json({
+        mensagem: "E-mail e senha são obrigatórios."
+      });
+    }
+
+    const usuario = await prisma.usuario.findUnique({
+      where: { email }
     });
 
     if (!usuario) {
+      return res.status(401).json({
+        mensagem: "E-mail ou senha inválidos"
+      });
+    }
+
+    const senhaValida = await bcrypt.compare(senha, usuario.senha);
+
+    if (!senhaValida) {
       return res.status(401).json({
         mensagem: "E-mail ou senha inválidos"
       });
@@ -130,12 +144,7 @@ app.get("/chamados", async (req, res) => {
 
 app.post("/chamados", async (req, res) => {
   try {
-    const {
-      condominio,
-      apartamento,
-      id_solicitante,
-      descricao_problema
-    } = req.body;
+    const { condominio, apartamento, id_solicitante, descricao_problema } = req.body;
 
     if (!condominio || !apartamento || !id_solicitante || !descricao_problema) {
       return res.status(400).json({
