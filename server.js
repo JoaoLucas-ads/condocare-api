@@ -1,18 +1,25 @@
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const { PrismaClient } = require("@prisma/client");
-const { PrismaBetterSqlite3 } = require("@prisma/adapter-better-sqlite3");
+const { PrismaPg } = require("@prisma/adapter-pg");
+const { Pool } = require("pg");
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const adapter = new PrismaBetterSqlite3({
-  url: process.env.DATABASE_URL || "file:./dev.db"
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL
 });
 
+const adapter = new PrismaPg(pool);
+
 const prisma = new PrismaClient({ adapter });
+
+// resto do seu código continua igual
 
 app.get("/", (req, res) => {
   res.send("CondoCare API funcionando");
@@ -23,13 +30,23 @@ app.get("/usuarios", async (req, res) => {
     const usuarios = await prisma.usuario.findMany();
     res.json(usuarios);
   } catch (error) {
-    res.status(500).json({ mensagem: "Erro ao buscar usuários", erro: error });
+    res.status(500).json({
+      mensagem: "Erro ao buscar usuários",
+      erro: error.message
+    });
   }
 });
 
 app.post("/usuarios", async (req, res) => {
   try {
-    const { nome, email, telefone, senha, tipo_perfil, subtipo_morador } = req.body;
+    const {
+      nome,
+      email,
+      telefone,
+      senha,
+      tipo_perfil,
+      subtipo_morador
+    } = req.body;
 
     if (!nome || !email || !senha) {
       return res.status(400).json({
@@ -48,9 +65,15 @@ app.post("/usuarios", async (req, res) => {
       }
     });
 
-    res.json({ mensagem: "Usuário cadastrado com sucesso", usuario });
+    res.json({
+      mensagem: "Usuário cadastrado com sucesso",
+      usuario
+    });
   } catch (error) {
-    res.status(500).json({ mensagem: "Erro ao cadastrar usuário", erro: error });
+    res.status(500).json({
+      mensagem: "Erro ao cadastrar usuário",
+      erro: error.message
+    });
   }
 });
 
@@ -59,7 +82,10 @@ app.post("/login", async (req, res) => {
     const { email, senha } = req.body;
 
     const usuario = await prisma.usuario.findFirst({
-      where: { email, senha }
+      where: {
+        email,
+        senha
+      }
     });
 
     if (!usuario) {
@@ -68,9 +94,15 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    res.json({ mensagem: "Login realizado com sucesso", usuario });
+    res.json({
+      mensagem: "Login realizado com sucesso",
+      usuario
+    });
   } catch (error) {
-    res.status(500).json({ mensagem: "Erro ao fazer login", erro: error });
+    res.status(500).json({
+      mensagem: "Erro ao fazer login",
+      erro: error.message
+    });
   }
 });
 
@@ -89,7 +121,10 @@ app.get("/chamados", async (req, res) => {
 
     res.json(chamados);
   } catch (error) {
-    res.status(500).json({ mensagem: "Erro ao buscar chamados", erro: error });
+    res.status(500).json({
+      mensagem: "Erro ao buscar chamados",
+      erro: error.message
+    });
   }
 });
 
@@ -140,7 +175,10 @@ app.post("/chamados", async (req, res) => {
       chamado
     });
   } catch (error) {
-    res.status(500).json({ mensagem: "Erro ao criar chamado", erro: error });
+    res.status(500).json({
+      mensagem: "Erro ao criar chamado",
+      erro: error.message
+    });
   }
 });
 
@@ -156,7 +194,9 @@ app.put("/chamados/:id/status", async (req, res) => {
     }
 
     const chamadoAtual = await prisma.chamado.findUnique({
-      where: { id_chamado: Number(id) }
+      where: {
+        id_chamado: Number(id)
+      }
     });
 
     if (!chamadoAtual) {
@@ -166,8 +206,12 @@ app.put("/chamados/:id/status", async (req, res) => {
     }
 
     const chamado = await prisma.chamado.update({
-      where: { id_chamado: Number(id) },
-      data: { status }
+      where: {
+        id_chamado: Number(id)
+      },
+      data: {
+        status
+      }
     });
 
     await prisma.historicoChamado.create({
@@ -187,8 +231,8 @@ app.put("/chamados/:id/status", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      mensagem: "Erro ao atualizar status do chamado",
-      erro: error
+      mensagem: "Erro ao atualizar status",
+      erro: error.message
     });
   }
 });
@@ -213,7 +257,7 @@ app.get("/historico/:id_chamado", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       mensagem: "Erro ao buscar histórico",
-      erro: error
+      erro: error.message
     });
   }
 });
@@ -233,11 +277,10 @@ app.get("/limpar-usuarios-temporario", async (req, res) => {
 
     res.status(500).json({
       mensagem: "Erro ao apagar usuários",
-      erro: error
+      erro: error.message
     });
   }
 });
-
 
 const PORT = process.env.PORT || 3000;
 
