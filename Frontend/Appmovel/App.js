@@ -452,6 +452,16 @@ function DetalhesScreen({ route, navigation }) {
 
   const statusStyle = corStatus(statusAtual);
 
+  function textoHistorico(status) {
+    if (status === "Aberto") return "🟢 Chamado aberto";
+    if (status === "EmAtendimento") return "🔵 Atendimento iniciado";
+    if (status === "Reagendado") return "🟡 Chamado reagendado";
+    if (status === "Finalizado") return "✅ Chamado finalizado";
+    if (status === "Cancelado") return "🔴 Chamado cancelado";
+
+    return status;
+  }
+
   async function carregarHistorico() {
     try {
       const resposta = await fetch(
@@ -632,13 +642,13 @@ function DetalhesScreen({ route, navigation }) {
               </Text>
 
               <Text style={styles.historicoTexto}>
-                {item.status_anterior || "Início"}
-                {" → "}
-                {item.status_novo}
+                {textoHistorico(item.status_novo)}
               </Text>
 
               <Text style={styles.historicoDescricao}>
-                {item.descricao}
+                {item.status_anterior
+                  ? `Status alterado de ${item.status_anterior} para ${item.status_novo}`
+                  : item.descricao}
               </Text>
 
               <Text style={styles.historicoData}>
@@ -651,7 +661,6 @@ function DetalhesScreen({ route, navigation }) {
     </ScrollView>
   );
 }
-
 
 
 function NovoChamadoScreen({ navigation }) {
