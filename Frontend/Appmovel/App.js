@@ -1036,6 +1036,11 @@ function DrawerNavigator({ funcLogout }) {
         options={{ headerShown: false }}
       />
 
+       <Drawer.Screen
+        name="Perfil"
+        component={PerfilScreen}
+      />
+
       <Drawer.Screen
         name="Configurações"
         component={ConfigScreen}
