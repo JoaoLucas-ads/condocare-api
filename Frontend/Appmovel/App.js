@@ -833,6 +833,27 @@ function ConfigScreen() {
   );
 }
 
+function SairScreen({ route }) {
+
+  async function sair() {
+    await AsyncStorage.removeItem("usuarioLogado");
+
+    route.params.funcLogout(false);
+  }
+
+  useEffect(() => {
+    sair();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.screenTitle}>
+        Saindo...
+      </Text>
+    </View>
+  );
+}
+
 function ContatosScreen() {
   return (
     <View style={styles.container}>
@@ -977,9 +998,29 @@ options={{title:'Chamados,'}}
   );
 }
 
+function SairScreen({ route }) {
+
+  async function sair() {
+    await AsyncStorage.removeItem("usuarioLogado");
+
+    route.params.funcLogout(false);
+  }
+
+  useEffect(() => {
+    sair();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.screenTitle}>
+        Saindo...
+      </Text>
+    </View>
+  );
+}
 
 
-function DrawerNavigator() {
+function DrawerNavigator({ funcLogout }) {
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -993,14 +1034,25 @@ function DrawerNavigator() {
         component={TabsNavigator}
         options={{ headerShown: false }}
       />
+
       <Drawer.Screen
         name="Configurações"
         component={ConfigScreen}
       />
+
       <Drawer.Screen
         name="Contatos"
         component={ContatosScreen}
       />
+
+      <Drawer.Screen
+        name="Sair"
+        component={SairScreen}
+        initialParams={{
+          funcLogout
+        }}
+      />
+
     </Drawer.Navigator>
   );
 }
@@ -1011,7 +1063,9 @@ export default function App() {
   return (
     <NavigationContainer>
       {estaLogado ? (
-        <DrawerNavigator />
+        <DrawerNavigator
+          funcLogout={setLogado}
+        />
       ) : (
         <Stack.Navigator
           screenOptions={{
