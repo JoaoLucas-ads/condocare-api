@@ -604,37 +604,41 @@ function ChamadosScreen({ navigation }) {
         onChangeText={setBusca}
       />
 
-    <ScrollView
-     horizontal
-    showsHorizontalScrollIndicator={false}
-    contentContainerStyle={styles.filtrosContainer}
-    style={styles.filtrosScroll}
-    >
-     {["Todos", "Aberto", "EmAtendimento", "Reagendado", "Finalizado"].map((status) => (
-        <TouchableOpacity
-        key={status}
-           style={[
-           styles.filtroBotao,
-            filtroStatus === status &&
-          styles.filtroBotaoAtivo
-      ]}
-        onPress={() =>
-      setFiltroStatus(status)}
-  >
-      <Text
-        numberOfLines={1}
-        ellipsizeMode="tail"
-        style={[
-          styles.filtroTexto,
-          filtroStatus === status &&
-          styles.filtroTextoAtivo
-        ]}
+          <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.filtrosContainer}
+        style={styles.filtrosScroll}
       >
-           {status}
-         </Text>
-       </TouchableOpacity>
-         ))}
-    </ScrollView>
+        {[
+          { label: "Todos", value: "Todos" },
+          { label: "Aberto", value: "Aberto" },
+          { label: "Atendimento", value: "EmAtendimento" },
+          { label: "Reagendado", value: "Reagendado" },
+          { label: "Finalizado", value: "Finalizado" }
+        ].map((status) => (
+          <TouchableOpacity
+            key={status.value}
+            style={[
+              styles.filtroBotao,
+              filtroStatus === status.value &&
+              styles.filtroBotaoAtivo
+            ]}
+            onPress={() => setFiltroStatus(status.value)}
+          >
+            <Text
+              numberOfLines={1}
+              style={[
+                styles.filtroTexto,
+                filtroStatus === status.value &&
+                styles.filtroTextoAtivo
+              ]}
+            >
+              {status.label}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       <FlatList
         data={lista}
@@ -2289,7 +2293,6 @@ filtroBotao: {
   marginRight: 7,
   paddingHorizontal: 10,
   height: 36,
-  minWidth: 78,
   borderRadius: 18,
   backgroundColor: "#DBEAFE",
   alignItems: "center",
