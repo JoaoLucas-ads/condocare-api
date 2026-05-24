@@ -409,9 +409,9 @@ function PerfilScreen() {
   );
 }
 
-
 function ChamadosScreen({ navigation }) {
   const [lista, setLista] = useState([]);
+  const [tipoPerfil, setTipoPerfil] = useState("");
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -425,6 +425,8 @@ function ChamadosScreen({ navigation }) {
     try {
       const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
       const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+
+      setTipoPerfil(usuario?.tipo_perfil || "");
 
       const resposta = await fetch("https://condocare-api.onrender.com/chamados");
       const dados = await resposta.json();
@@ -457,9 +459,14 @@ function ChamadosScreen({ navigation }) {
   return (
     <View style={styles.chamadosContainer}>
       <View style={styles.chamadosHeader}>
-        <Text style={styles.chamadosTitle}>Chamados</Text>
+        <Text style={styles.chamadosTitle}>
+          {tipoPerfil === "Morador" ? "Meus Chamados" : "Todos os Chamados"}
+        </Text>
+
         <Text style={styles.chamadosSubtitle}>
-          Acompanhe as ocorrências cadastradas e o andamento dos atendimentos
+          {tipoPerfil === "Morador"
+            ? "Acompanhe as ocorrências abertas por você"
+            : "Acompanhe as ocorrências cadastradas e o andamento dos atendimentos"}
         </Text>
       </View>
 
@@ -509,15 +516,17 @@ function ChamadosScreen({ navigation }) {
         }}
       />
 
-      <TouchableOpacity
-        style={styles.chamadoBotaoNovo}
-        onPress={() => navigation.navigate("NovoChamado")}
-      >
-        <Text style={styles.chamadoBotaoNovoTexto}>+ Novo chamado</Text>
-      </TouchableOpacity>
-    </View>
-  );
+         <TouchableOpacity
+            style={styles.chamadoBotaoNovo}
+             onPress={() => navigation.navigate("NovoChamado")}
+        >
+          <Text style={styles.chamadoBotaoNovoTexto}>+ Novo chamado</Text>
+        </TouchableOpacity>
+      </View>
+    );
 }
+
+
 function DetalhesScreen({ route, navigation }) {
   const { chamado } = route.params;
   const [statusAtual, setStatusAtual] = useState(chamado.status);
