@@ -539,6 +539,7 @@ function DetalhesScreen({ route, navigation }) {
   const { chamado } = route.params;
   const [statusAtual, setStatusAtual] = useState(chamado.status);
   const [historico, setHistorico] = useState([]);
+  const [usuario, setUsuario] = useState(null);
 
   const statusStyle = corStatus(statusAtual);
 
@@ -568,7 +569,17 @@ function DetalhesScreen({ route, navigation }) {
   }
 
   useEffect(() => {
-    carregarHistorico();
+    async function carregarDados() {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+
+      if (usuarioSalvo) {
+        setUsuario(JSON.parse(usuarioSalvo));
+      }
+
+      carregarHistorico();
+    }
+
+    carregarDados();
   }, []);
 
   async function alterarStatus(novoStatus) {
@@ -610,6 +621,47 @@ function DetalhesScreen({ route, navigation }) {
 
     } catch (error) {
       Alert.alert("Erro", "Não foi possível conectar com o servidor.");
+    }
+  }
+
+  async function atribuirTecnico() {
+    try {
+      const resposta = await fetch(
+        `https://condocare-api.onrender.com/chamados/${chamado.id}/tecnico`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            id_tecnico_executor: 1,
+            id_usuario: usuario.id_usuario
+          })
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if (!resposta.ok) {
+        Alert.alert(
+          "Erro",
+          dados.mensagem || "Erro ao atribuir técnico."
+        );
+        return;
+      }
+
+      await carregarHistorico();
+
+      Alert.alert(
+        "Sucesso",
+        "João foi atribuído ao chamado."
+      );
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        "Não foi possível conectar ao servidor."
+      );
     }
   }
 
@@ -711,6 +763,19 @@ function DetalhesScreen({ route, navigation }) {
 
       {statusAtual !== "Finalizado" ? (
         <View style={styles.detalhesAcoes}>
+
+          {(usuario?.tipo_perfil === "Administrador" ||
+            usuario?.tipo_perfil === "Sindico") && (
+            <TouchableOpacity
+              style={styles.statusButtonBlue}
+              onPress={atribuirTecnico}
+            >
+              <Text style={styles.statusButtonText}>
+                Atribuir João (Técnico)
+              </Text>
+            </TouchableOpacity>
+          )}
+
           <TouchableOpacity
             style={styles.statusButton}
             onPress={() => alterarStatus("EmAtendimento")}
