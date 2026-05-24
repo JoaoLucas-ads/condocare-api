@@ -126,6 +126,7 @@ app.get("/chamados", async (req, res) => {
       include: {
         unidade: true,
         solicitante: true,
+        tecnico_executor: true,
         historicos: true
       },
       orderBy: {
@@ -241,6 +242,74 @@ app.put("/chamados/:id/status", async (req, res) => {
   } catch (error) {
     res.status(500).json({
       mensagem: "Erro ao atualizar status",
+      erro: error.message
+    });
+  }
+});
+
+app.put("/chamados/:id/tecnico", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { id_tecnico_executor, id_usuario } = req.body;
+
+    if (!id_tecnico_executor) {
+      return res.status(400).json({
+        mensagem: "Técnico é obrigatório."
+      });
+    }
+
+    const chamadoAtual = await prisma.chamado.findUnique({
+      where: {
+        id_chamado: Number(id)
+      }
+    });
+
+    if (!chamadoAtual) {
+      return res.status(404).json({
+        mensagem: "Chamado não encontrado."
+      });
+    }
+
+    const tecnico = await prisma.usuario.findUnique({
+      where: {
+        id_usuario: Number(id_tecnico_executor)
+      }
+    });
+
+    if (!tecnico || tecnico.tipo_perfil !== "Tecnico") {
+      return res.status(400).json({
+        mensagem: "Usuário selecionado não é um técnico válido."
+      });
+    }
+
+    const chamado = await prisma.chamado.update({
+      where: {
+        id_chamado: Number(id)
+      },
+      data: {
+        id_tecnico_executor: Number(id_tecnico_executor)
+      }
+    });
+
+    await prisma.historicoChamado.create({
+      data: {
+        id_chamado: Number(id),
+        id_usuario: Number(id_usuario || chamadoAtual.id_solicitante),
+        acao: "Atribuição de técnico",
+        status_anterior: chamadoAtual.status,
+        status_novo: chamadoAtual.status,
+        descricao: `Técnico ${tecnico.nome} atribuído ao chamado`
+      }
+    });
+
+    res.json({
+      mensagem: "Técnico atribuído com sucesso",
+      chamado
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      mensagem: "Erro ao atribuir técnico",
       erro: error.message
     });
   }
