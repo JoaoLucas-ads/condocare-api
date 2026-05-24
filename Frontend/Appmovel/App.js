@@ -640,7 +640,8 @@ function ChamadosScreen({ navigation }) {
         ))}
       </ScrollView>
 
-      <FlatList
+    <FlatList
+       style={{ flex: 1 }}
         data={lista}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
@@ -2278,22 +2279,22 @@ historicoTitulo: {
 
 filtrosScroll: {
   marginTop: 10,
-  marginBottom: 18,
-  height: 46,
-  maxHeight: 46,
+  marginBottom: 15,
+  height: 44,
+  maxHeight: 44,
+  flexGrow: 0,
 },
 
 filtrosContainer: {
-  paddingVertical: 4,
-  paddingRight: 24,
+  paddingRight: 15,
   alignItems: "center",
 },
 
 filtroBotao: {
-  marginRight: 7,
-  paddingHorizontal: 10,
-  height: 36,
-  borderRadius: 18,
+  marginRight: 6,
+  paddingHorizontal: 8,
+  height: 34,
+  borderRadius: 17,
   backgroundColor: "#DBEAFE",
   alignItems: "center",
   justifyContent: "center",
@@ -2306,11 +2307,12 @@ filtroBotaoAtivo: {
 filtroTexto: {
   color: "#1D4ED8",
   fontWeight: "700",
-  fontSize: 12,
+  fontSize: 11,
 },
 
 filtroTextoAtivo: {
   color: "#FFFFFF",
 },
+
 
 });
