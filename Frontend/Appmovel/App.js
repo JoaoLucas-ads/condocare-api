@@ -2271,25 +2271,26 @@ historicoTitulo: {
 
 filtrosScroll: {
   marginTop: 10,
-  marginBottom: 10,
-  maxHeight: 48,
+  marginBottom: 18,
+  height: 46,
+  maxHeight: 46,
 },
 
 filtrosContainer: {
   paddingVertical: 4,
-  paddingRight: 20,
+  paddingRight: 24,
+  alignItems: "center",
 },
 
 filtroBotao: {
   marginRight: 8,
   paddingHorizontal: 14,
-  paddingVertical: 8,
-  borderRadius: 20,
+  height: 36,
+  minWidth: 90,
+  borderRadius: 18,
   backgroundColor: "#DBEAFE",
   alignItems: "center",
   justifyContent: "center",
-  height: 36,
-  minWidth: 80,
 },
 
 filtroBotaoAtivo: {
@@ -2299,7 +2300,7 @@ filtroBotaoAtivo: {
 filtroTexto: {
   color: "#1D4ED8",
   fontWeight: "700",
-  fontSize: 12,
+  fontSize: 13,
 },
 
 filtroTextoAtivo: {
