@@ -620,8 +620,9 @@ function ChamadosScreen({ navigation }) {
             onPress={() => setFiltroStatus(status)}
           >
             <Text
-              numberOfLines={1}
-              style={[
+             numberOfLines={1}
+                ellipsizeMode="tail"
+                 style={[
                 styles.filtroTexto,
                 filtroStatus === status && styles.filtroTextoAtivo
               ]}
@@ -2269,22 +2270,22 @@ historicoTitulo: {
 },
 
 filtrosScroll: {
-  marginTop: 12,
-  marginBottom: 12,
+  marginTop: 10,
+  marginBottom: 10,
+  maxHeight: 48,
 },
 
 filtrosContainer: {
-  paddingVertical: 8,
-  paddingRight: 30,
+  paddingVertical: 4,
+  paddingRight: 20,
 },
 
 filtroBotao: {
-  marginRight: 10,
-  paddingHorizontal: 18,
-  paddingVertical: 10,
-  borderRadius: 25,
+  marginRight: 8,
+  paddingHorizontal: 14,
+  paddingVertical: 8,
+  borderRadius: 20,
   backgroundColor: "#DBEAFE",
-  minWidth: 115,
   alignItems: "center",
   justifyContent: "center",
 },
@@ -2296,7 +2297,7 @@ filtroBotaoAtivo: {
 filtroTexto: {
   color: "#1D4ED8",
   fontWeight: "700",
-  fontSize: 13,
+  fontSize: 12,
 },
 
 filtroTextoAtivo: {
