@@ -271,15 +271,26 @@ function HomeScreen({ navigation }) {
   async function carregarDashboard() {
     try {
 
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+      const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+
       const resposta = await fetch(
         "https://condocare-api.onrender.com/chamados"
       );
 
       const dados = await resposta.json();
 
-      setTotalChamados(dados.length);
+      let chamadosFiltrados = dados;
 
-      const chamadosPendentes = dados.filter(
+      if (usuario?.tipo_perfil === "Morador") {
+        chamadosFiltrados = dados.filter(
+          item => item.id_solicitante === usuario.id_usuario
+        );
+      }
+
+      setTotalChamados(chamadosFiltrados.length);
+
+      const chamadosPendentes = chamadosFiltrados.filter(
         item =>
           item.status === "Aberto" ||
           item.status === "Reagendado"
@@ -358,44 +369,6 @@ useEffect(() => {
       </View>
     </ScrollView>
   )
-}
-
-function PerfilScreen() {
-  const [usuario, setUsuario] = useState(null);
-
-  useEffect(() => {
-    async function carregarUsuario() {
-      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
-
-      if (usuarioSalvo) {
-        setUsuario(JSON.parse(usuarioSalvo));
-      }
-    }
-
-    carregarUsuario();
-  }, []);
-
-  return (
-    <View style={styles.container}>
-      <Text style={styles.screenTitle}>Perfil</Text>
-      <View style={styles.card}>
-        <Text style={styles.detailLabel}>Nome</Text>
-        <Text style={styles.detailValue}>
-          {usuario?.nome || "Usuária do Sistema"}
-        </Text>
-
-        <Text style={styles.detailLabel}>Tipo de acesso</Text>
-        <Text style={styles.detailValue}>
-          {usuario?.tipo_perfil || "Administrador"}
-        </Text>
-
-        <Text style={styles.detailLabel}>E-mail</Text>
-        <Text style={styles.detailValue}>
-          {usuario?.email || "usuario@email.com"}
-        </Text>
-      </View>
-    </View>
-  );
 }
 
 
