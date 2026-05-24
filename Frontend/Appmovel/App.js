@@ -1268,23 +1268,140 @@ function NovoChamadoScreen({ navigation }) {
 
 
 function AvisosScreen() {
+
+  const [avisos, setAvisos] = useState([]);
+
+  useEffect(() => {
+
+    async function carregarAvisos() {
+
+      const usuarioSalvo =
+      await AsyncStorage.getItem(
+        "usuarioLogado"
+      );
+
+      const usuario =
+      usuarioSalvo
+      ? JSON.parse(usuarioSalvo)
+      : null;
+
+      let listaAvisos=[];
+
+      if(
+      usuario?.tipo_perfil===
+      "Tecnico"
+      ){
+
+        listaAvisos=[
+
+        {
+          titulo:
+          "🔔 Novo chamado atribuído",
+
+          texto:
+          "Você possui chamados atribuídos para atendimento."
+        },
+
+        {
+          titulo:
+          "📅 Agenda técnica",
+
+          texto:
+          "Verifique os atendimentos pendentes."
+        }
+
+        ];
+      }
+
+      else if(
+      usuario?.tipo_perfil===
+      "Morador"
+      ){
+
+        listaAvisos=[
+
+        {
+          titulo:
+          "📢 Acompanhe seu chamado",
+
+          texto:
+          "Veja o andamento das suas solicitações."
+        },
+
+        {
+          titulo:
+          "🏢 Manutenção preventiva",
+
+          texto:
+          "Haverá visita técnica quarta-feira às 14h."
+        }
+
+        ];
+      }
+
+      else{
+
+        listaAvisos=[
+
+        {
+          titulo:
+          "👨‍💼 Painel administrativo",
+
+          texto:
+          "Existem chamados aguardando gerenciamento."
+        },
+
+        {
+          titulo:
+          "⚙ Atualização do sistema",
+
+          texto:
+          "Novas funcionalidades foram adicionadas."
+        }
+
+        ];
+      }
+
+      setAvisos(
+      listaAvisos
+      );
+    }
+
+    carregarAvisos();
+
+  },[]);
+
   return (
     <View style={styles.container}>
-      <Text style={styles.screenTitle}>Avisos</Text>
 
-      <View style={styles.card}>
-        <Text style={styles.noticeTitle}>Manutenção preventiva</Text>
-        <Text style={styles.noticeText}>
-          Haverá visita técnica programada na quarta-feira às 14h.
-        </Text>
+      <Text style={styles.screenTitle}>
+        Avisos
+      </Text>
+
+      {avisos.map(
+      (item,index)=>(
+
+      <View
+      key={index}
+      style={styles.card}
+      >
+
+      <Text
+      style={styles.noticeTitle}
+      >
+      {item.titulo}
+      </Text>
+
+      <Text
+      style={styles.noticeText}
+      >
+      {item.texto}
+      </Text>
+
       </View>
 
-      <View style={styles.card}>
-        <Text style={styles.noticeTitle}>Atualização do sistema</Text>
-        <Text style={styles.noticeText}>
-          Novas categorias de chamados foram adicionadas ao painel.
-        </Text>
-      </View>
+      ))}
+
     </View>
   );
 }
