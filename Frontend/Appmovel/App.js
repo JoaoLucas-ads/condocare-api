@@ -175,7 +175,6 @@ function RegistrarScreen({ navigation }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
-  const [tipoPerfil, setTipoPerfil] = useState("Morador");
 
   async function cadastrarUsuario() {
     if (!nome || !email || !senha) {
@@ -194,8 +193,8 @@ function RegistrarScreen({ navigation }) {
           email: email,
           telefone: "",
           senha: senha,
-          tipo_perfil: tipoPerfil,
-          subtipo_morador: tipoPerfil === "Morador" ? "Proprietario" : null
+          tipo_perfil: "Morador",
+          subtipo_morador: "Proprietario"
         })
       });
 
@@ -218,12 +217,14 @@ function RegistrarScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <View style={styles.centerContent}>
         <Text style={styles.mainTitle}>Registrar</Text>
+
         <Text style={styles.subtitle}>
           Preencha os dados para criar seu acesso
         </Text>
 
         <View style={styles.card}>
           <Text style={styles.inputLabel}>Nome</Text>
+
           <TextInput
             style={styles.input}
             placeholder="Digite seu nome"
@@ -233,6 +234,7 @@ function RegistrarScreen({ navigation }) {
           />
 
           <Text style={styles.inputLabel}>E-mail</Text>
+
           <TextInput
             style={styles.input}
             placeholder="Digite seu e-mail"
@@ -244,6 +246,7 @@ function RegistrarScreen({ navigation }) {
           />
 
           <Text style={styles.inputLabel}>Senha</Text>
+
           <TextInput
             style={styles.input}
             placeholder="Crie uma senha"
@@ -253,64 +256,20 @@ function RegistrarScreen({ navigation }) {
             onChangeText={setSenha}
           />
 
-          <Text style={styles.inputLabel}>Tipo de perfil</Text>
-
-          <View style={styles.homeMetricsRow}>
-            <TouchableOpacity
-              style={[
-                styles.homeMetricCard,
-                tipoPerfil === "Morador" && { borderWidth: 2, borderColor: "#F97316" }
-              ]}
-              onPress={() => setTipoPerfil("Morador")}
-            >
-              <Text style={styles.homeMetricLabel}>Morador</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.homeMetricCard,
-                tipoPerfil === "Tecnico" && { borderWidth: 2, borderColor: "#F97316" }
-              ]}
-              onPress={() => setTipoPerfil("Tecnico")}
-            >
-              <Text style={styles.homeMetricLabel}>Técnico</Text>
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.homeMetricsRow}>
-            <TouchableOpacity
-              style={[
-                styles.homeMetricCard,
-                tipoPerfil === "Administrador" && { borderWidth: 2, borderColor: "#F97316" }
-              ]}
-              onPress={() => setTipoPerfil("Administrador")}
-            >
-              <Text style={styles.homeMetricLabel}>Admin</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[
-                styles.homeMetricCard,
-                tipoPerfil === "Sindico" && { borderWidth: 2, borderColor: "#F97316" }
-              ]}
-              onPress={() => setTipoPerfil("Sindico")}
-            >
-              <Text style={styles.homeMetricLabel}>Síndico</Text>
-            </TouchableOpacity>
-          </View>
-
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={cadastrarUsuario}
           >
-            <Text style={styles.primaryButtonText}>Finalizar cadastro</Text>
+            <Text style={styles.primaryButtonText}>
+              Finalizar cadastro
+            </Text>
           </TouchableOpacity>
+
         </View>
       </View>
     </ScrollView>
   );
 }
-
 
 function HomeScreen({ navigation }) {
 
