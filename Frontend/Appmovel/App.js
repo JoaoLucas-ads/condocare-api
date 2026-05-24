@@ -175,6 +175,7 @@ function RegistrarScreen({ navigation }) {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [tipoPerfil, setTipoPerfil] = useState("Morador");
 
   async function cadastrarUsuario() {
     if (!nome || !email || !senha) {
@@ -193,8 +194,8 @@ function RegistrarScreen({ navigation }) {
           email: email,
           telefone: "",
           senha: senha,
-          tipo_perfil: "Morador",
-          subtipo_morador: "Proprietario"
+          tipo_perfil: tipoPerfil,
+          subtipo_morador: tipoPerfil === "Morador" ? "Proprietario" : null
         })
       });
 
@@ -252,6 +253,52 @@ function RegistrarScreen({ navigation }) {
             onChangeText={setSenha}
           />
 
+          <Text style={styles.inputLabel}>Tipo de perfil</Text>
+
+          <View style={styles.homeMetricsRow}>
+            <TouchableOpacity
+              style={[
+                styles.homeMetricCard,
+                tipoPerfil === "Morador" && { borderWidth: 2, borderColor: "#F97316" }
+              ]}
+              onPress={() => setTipoPerfil("Morador")}
+            >
+              <Text style={styles.homeMetricLabel}>Morador</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.homeMetricCard,
+                tipoPerfil === "Tecnico" && { borderWidth: 2, borderColor: "#F97316" }
+              ]}
+              onPress={() => setTipoPerfil("Tecnico")}
+            >
+              <Text style={styles.homeMetricLabel}>Técnico</Text>
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.homeMetricsRow}>
+            <TouchableOpacity
+              style={[
+                styles.homeMetricCard,
+                tipoPerfil === "Administrador" && { borderWidth: 2, borderColor: "#F97316" }
+              ]}
+              onPress={() => setTipoPerfil("Administrador")}
+            >
+              <Text style={styles.homeMetricLabel}>Admin</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[
+                styles.homeMetricCard,
+                tipoPerfil === "Sindico" && { borderWidth: 2, borderColor: "#F97316" }
+              ]}
+              onPress={() => setTipoPerfil("Sindico")}
+            >
+              <Text style={styles.homeMetricLabel}>Síndico</Text>
+            </TouchableOpacity>
+          </View>
+
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={cadastrarUsuario}
@@ -263,6 +310,8 @@ function RegistrarScreen({ navigation }) {
     </ScrollView>
   );
 }
+
+
 function HomeScreen({ navigation }) {
 
   const [totalChamados, setTotalChamados] = useState(0);
