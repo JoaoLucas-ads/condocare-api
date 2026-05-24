@@ -604,34 +604,37 @@ function ChamadosScreen({ navigation }) {
         onChangeText={setBusca}
       />
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.filtrosContainer}
-        style={styles.filtrosScroll}
+    <ScrollView
+     horizontal
+    showsHorizontalScrollIndicator={false}
+    contentContainerStyle={styles.filtrosContainer}
+    style={styles.filtrosScroll}
+    >
+     {["Todos", "Aberto", "EmAtendimento", "Reagendado", "Finalizado"].map((status) => (
+        <TouchableOpacity
+        key={status}
+           style={[
+           styles.filtroBotao,
+            filtroStatus === status &&
+          styles.filtroBotaoAtivo
+      ]}
+        onPress={() =>
+      setFiltroStatus(status)}
+  >
+      <Text
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        style={[
+          styles.filtroTexto,
+          filtroStatus === status &&
+          styles.filtroTextoAtivo
+        ]}
       >
-        {["Todos", "Aberto", "EmAtendimento", "Reagendado", "Finalizado"].map((status) => (
-          <TouchableOpacity
-            key={status}
-            style={[
-              styles.filtroBotao,
-              filtroStatus === status && styles.filtroBotaoAtivo
-            ]}
-            onPress={() => setFiltroStatus(status)}
-          >
-            <Text
-             numberOfLines={1}
-                ellipsizeMode="tail"
-                 style={[
-                styles.filtroTexto,
-                filtroStatus === status && styles.filtroTextoAtivo
-              ]}
-            >
-              {status}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </ScrollView>
+           {status}
+         </Text>
+       </TouchableOpacity>
+         ))}
+    </ScrollView>
 
       <FlatList
         data={lista}
@@ -2283,10 +2286,10 @@ filtrosContainer: {
 },
 
 filtroBotao: {
-  marginRight: 8,
-  paddingHorizontal: 14,
+  marginRight: 7,
+  paddingHorizontal: 10,
   height: 36,
-  minWidth: 90,
+  minWidth: 78,
   borderRadius: 18,
   backgroundColor: "#DBEAFE",
   alignItems: "center",
@@ -2300,7 +2303,7 @@ filtroBotaoAtivo: {
 filtroTexto: {
   color: "#1D4ED8",
   fontWeight: "700",
-  fontSize: 13,
+  fontSize: 12,
 },
 
 filtroTextoAtivo: {
