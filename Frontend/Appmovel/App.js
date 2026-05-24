@@ -537,9 +537,15 @@ function ChamadosScreen({ navigation }) {
 
 function DetalhesScreen({ route, navigation }) {
   const { chamado } = route.params;
+
   const [statusAtual, setStatusAtual] = useState(chamado.status);
   const [historico, setHistorico] = useState([]);
   const [usuarioLogado, setUsuarioLogado] = useState(null);
+
+  const [tecnicoNome, setTecnicoNome] = useState(
+    chamado.chamadoOriginal?.tecnico_executor?.nome ||
+    "A definir"
+  );
 
   const statusStyle = corStatus(statusAtual);
 
@@ -555,6 +561,7 @@ function DetalhesScreen({ route, navigation }) {
 
   async function carregarHistorico() {
     try {
+
       const resposta = await fetch(
         `https://condocare-api.onrender.com/historico/${chamado.id}`
       );
@@ -569,6 +576,7 @@ function DetalhesScreen({ route, navigation }) {
   }
 
   useEffect(() => {
+
     async function carregarDados() {
 
       const usuarioSalvo =
@@ -577,6 +585,7 @@ function DetalhesScreen({ route, navigation }) {
       );
 
       if (usuarioSalvo) {
+
         setUsuarioLogado(
           JSON.parse(usuarioSalvo)
         );
@@ -590,53 +599,75 @@ function DetalhesScreen({ route, navigation }) {
   }, []);
 
   async function alterarStatus(novoStatus) {
+
     try {
-      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+
+      const usuarioSalvo =
+      await AsyncStorage.getItem(
+        "usuarioLogado"
+      );
 
       if (!usuarioSalvo) {
-        Alert.alert("Erro", "Usuário não encontrado. Faça login novamente.");
+
+        Alert.alert(
+          "Erro",
+          "Usuário não encontrado."
+        );
+
         return;
       }
 
-      const usuario = JSON.parse(usuarioSalvo);
+      const usuario =
+      JSON.parse(usuarioSalvo);
 
-      const resposta = await fetch(
+      const resposta =
+      await fetch(
         `https://condocare-api.onrender.com/chamados/${chamado.id}/status`,
         {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json"
+          method:"PUT",
+
+          headers:{
+            "Content-Type":"application/json"
           },
-          body: JSON.stringify({
-            status: novoStatus,
-            id_usuario: usuario.id_usuario
+
+          body:JSON.stringify({
+            status:novoStatus,
+            id_usuario:
+            usuario.id_usuario
           })
         }
       );
 
-      const dados = await resposta.json();
+      const dados =
+      await resposta.json();
 
-      if (!resposta.ok) {
-        Alert.alert("Erro", dados.mensagem || "Erro ao atualizar status.");
+      if(!resposta.ok){
+
+        Alert.alert(
+          "Erro",
+          dados.mensagem
+        );
+
         return;
       }
 
-      setStatusAtual(novoStatus);
+      setStatusAtual(
+        novoStatus
+      );
 
       await carregarHistorico();
 
       Alert.alert(
         "Sucesso",
-        "Status atualizado com sucesso."
+        "Status atualizado"
       );
 
-    } catch (error) {
+    } catch(error){
 
       Alert.alert(
         "Erro",
-        "Não foi possível conectar com o servidor."
+        "Não foi possível conectar."
       );
-
     }
   }
 
@@ -665,11 +696,11 @@ function DetalhesScreen({ route, navigation }) {
       const tecnicoJoao =
       usuarios.find(
         item =>
-          item.email === "joao@gmail.com" &&
-          item.tipo_perfil === "Tecnico"
+        item.email==="joao@gmail.com" &&
+        item.tipo_perfil==="Tecnico"
       );
 
-      if (!tecnicoJoao) {
+      if(!tecnicoJoao){
 
         Alert.alert(
           "Erro",
@@ -716,6 +747,10 @@ function DetalhesScreen({ route, navigation }) {
 
       await carregarHistorico();
 
+      setTecnicoNome(
+        tecnicoJoao.nome
+      );
+
       Alert.alert(
         "Sucesso",
         "João atribuído ao chamado"
@@ -732,19 +767,20 @@ function DetalhesScreen({ route, navigation }) {
 
   return (
     <ScrollView contentContainerStyle={styles.detalhesContainer}>
+
       <View style={styles.detalhesHeader}>
         <Text style={styles.detalhesTitle}>
           Detalhes do Chamado
         </Text>
 
         <Text style={styles.detalhesSubtitle}>
-          Visualize as informações completas da solicitação de atendimento
+          Visualize as informações completas da solicitação
         </Text>
       </View>
 
       <View style={styles.detalhesHeroCard}>
         <Text style={styles.detalhesProblema}>
-          {chamado.titulo || "Chamado sem título"}
+          {chamado.titulo || "Sem título"}
         </Text>
 
         <Text
@@ -763,40 +799,6 @@ function DetalhesScreen({ route, navigation }) {
         </Text>
       </View>
 
-      <View style={styles.detalhesCard}>
-
-        <View style={styles.detalhesBloco}>
-          <Text style={styles.detalhesLabel}>
-            Condomínio
-          </Text>
-
-          <Text style={styles.detalhesValor}>
-            {chamado.condominio || "Não informado"}
-          </Text>
-        </View>
-
-        <View style={styles.detalhesBloco}>
-          <Text style={styles.detalhesLabel}>
-            Unidade
-          </Text>
-
-          <Text style={styles.detalhesValor}>
-            {chamado.apartamento || "Não informado"}
-          </Text>
-        </View>
-
-        <View style={styles.detalhesBloco}>
-          <Text style={styles.detalhesLabel}>
-            Descrição do problema
-          </Text>
-
-          <Text style={styles.detalhesDescricao}>
-            {chamado.observacao || "Sem descrição"}
-          </Text>
-        </View>
-
-      </View>
-
       <View style={styles.detalhesInfoCard}>
 
         <Text style={styles.detalhesInfoTitulo}>
@@ -809,7 +811,7 @@ function DetalhesScreen({ route, navigation }) {
           </Text>
 
           <Text style={styles.detalhesLinhaValor}>
-            {chamado.chamadoOriginal?.tecnico_executor?.nome || "A definir"}
+            {tecnicoNome}
           </Text>
         </View>
 
@@ -819,21 +821,14 @@ function DetalhesScreen({ route, navigation }) {
 
         <View style={styles.detalhesAcoes}>
 
-          {(usuarioLogado?.tipo_perfil ===
-          "Administrador" ||
-
-          usuarioLogado?.tipo_perfil ===
-          "Sindico") && (
+          {(usuarioLogado?.tipo_perfil==="Administrador" ||
+          usuarioLogado?.tipo_perfil==="Sindico") && (
 
             <TouchableOpacity
               style={styles.statusButtonBlue}
-              onPress={
-                atribuirTecnicoJoao
-              }
+              onPress={atribuirTecnicoJoao}
             >
-              <Text
-                style={styles.statusButtonText}
-              >
+              <Text style={styles.statusButtonText}>
                 Atribuir João Técnico
               </Text>
             </TouchableOpacity>
@@ -842,39 +837,36 @@ function DetalhesScreen({ route, navigation }) {
 
           <TouchableOpacity
             style={styles.statusButton}
-            onPress={() =>
+            onPress={()=>
             alterarStatus(
               "EmAtendimento"
             )}
           >
-            <Text
-            style={styles.statusButtonText}>
+            <Text style={styles.statusButtonText}>
               Iniciar Atendimento
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.statusButtonBlue}
-            onPress={() =>
+            onPress={()=>
             alterarStatus(
               "Reagendado"
             )}
           >
-            <Text
-            style={styles.statusButtonText}>
+            <Text style={styles.statusButtonText}>
               Reagendar
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.statusButtonRed}
-            onPress={() =>
+            onPress={()=>
             alterarStatus(
               "Finalizado"
             )}
           >
-            <Text
-            style={styles.statusButtonText}>
+            <Text style={styles.statusButtonText}>
               Finalizar Chamado
             </Text>
           </TouchableOpacity>
@@ -886,7 +878,6 @@ function DetalhesScreen({ route, navigation }) {
         <View style={styles.detalhesAcoes}>
           <Text style={styles.historicoDescricao}>
             ✅ Chamado finalizado.
-            Nenhuma nova alteração pode ser feita.
           </Text>
         </View>
 
@@ -897,12 +888,16 @@ function DetalhesScreen({ route, navigation }) {
           Histórico do Chamado
         </Text>
 
-        {historico.length === 0 ? (
+        {historico.length===0 ? (
+
           <Text style={styles.historicoVazio}>
             Nenhum histórico registrado ainda.
           </Text>
+
         ) : (
-          historico.map((item) => (
+
+          historico.map((item)=>(
+
             <View
               key={item.id_historico}
               style={styles.historicoItem}
@@ -912,21 +907,26 @@ function DetalhesScreen({ route, navigation }) {
               </Text>
 
               <Text style={styles.historicoTexto}>
-                {textoHistorico(item.status_novo)}
+                {textoHistorico(
+                  item.status_novo
+                )}
               </Text>
 
               <Text style={styles.historicoDescricao}>
                 {item.status_anterior
-                  ? `Status alterado de ${item.status_anterior} para ${item.status_novo}`
-                  : item.descricao}
+                ? `Status alterado de ${item.status_anterior} para ${item.status_novo}`
+                : item.descricao}
               </Text>
 
               <Text style={styles.historicoData}>
                 🕒 {new Date(item.data_acao).toLocaleString()}
               </Text>
             </View>
+
           ))
+
         )}
+
       </View>
 
     </ScrollView>
