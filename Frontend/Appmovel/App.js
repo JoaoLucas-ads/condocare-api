@@ -649,7 +649,6 @@ function DetalhesScreen({ route, navigation }) {
 
   async function carregarHistorico() {
     try {
-
       const resposta = await fetch(
         `https://condocare-api.onrender.com/historico/${chamado.id}`
       );
@@ -923,41 +922,45 @@ function DetalhesScreen({ route, navigation }) {
 
           )}
 
-          <TouchableOpacity
-            style={styles.statusButton}
-            onPress={()=>
-            alterarStatus(
-              "EmAtendimento"
-            )}
-          >
-            <Text style={styles.statusButtonText}>
-              Iniciar Atendimento
-            </Text>
-          </TouchableOpacity>
+          {usuarioLogado?.tipo_perfil==="Tecnico" && (
+            <>
+              <TouchableOpacity
+                style={styles.statusButton}
+                onPress={()=>
+                alterarStatus(
+                  "EmAtendimento"
+                )}
+              >
+                <Text style={styles.statusButtonText}>
+                  Iniciar Atendimento
+                </Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.statusButtonBlue}
-            onPress={()=>
-            alterarStatus(
-              "Reagendado"
-            )}
-          >
-            <Text style={styles.statusButtonText}>
-              Reagendar
-            </Text>
-          </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.statusButtonBlue}
+                onPress={()=>
+                alterarStatus(
+                  "Reagendado"
+                )}
+              >
+                <Text style={styles.statusButtonText}>
+                  Reagendar
+                </Text>
+              </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.statusButtonRed}
-            onPress={()=>
-            alterarStatus(
-              "Finalizado"
-            )}
-          >
-            <Text style={styles.statusButtonText}>
-              Finalizar Chamado
-            </Text>
-          </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.statusButtonRed}
+                onPress={()=>
+                alterarStatus(
+                  "Finalizado"
+                )}
+              >
+                <Text style={styles.statusButtonText}>
+                  Finalizar Chamado
+                </Text>
+              </TouchableOpacity>
+            </>
+          )}
 
         </View>
 
@@ -1020,7 +1023,6 @@ function DetalhesScreen({ route, navigation }) {
     </ScrollView>
   );
 }
-
 function NovoChamadoScreen({ navigation }) {
   const [condominio, setCondominio] = useState('');
   const [apartamento, setApartamento] = useState('');
