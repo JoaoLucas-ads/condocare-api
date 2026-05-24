@@ -263,50 +263,98 @@ function RegistrarScreen({ navigation }) {
     </ScrollView>
   );
 }
-function HomeScreen({ navigation}) {
+function HomeScreen({ navigation }) {
+
+  const [totalChamados, setTotalChamados] = useState(0);
+  const [pendentes, setPendentes] = useState(0);
+
+  async function carregarDashboard() {
+    try {
+
+      const resposta = await fetch(
+        "https://condocare-api.onrender.com/chamados"
+      );
+
+      const dados = await resposta.json();
+
+      setTotalChamados(dados.length);
+
+      const chamadosPendentes = dados.filter(
+        item =>
+          item.status === "Aberto" ||
+          item.status === "Reagendado"
+      );
+
+      setPendentes(chamadosPendentes.length);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    carregarDashboard();
+  }, []);
+
   return(
     <ScrollView contentContainerStyle={styles.homeContainer}>
       <View style={styles.homeHeader}>
         <Text style={styles.homeGreeting}>Bem-Vinda</Text>
         <Text style={styles.homeTitle}>Painel de Controle</Text>
         <Text style={styles.homeSubtitle}>
-          Acompanhe os principais dados do sistema de manutenção</Text>
+          Acompanhe os principais dados do sistema de manutenção
+        </Text>
       </View>
 
       <View style={styles.homeHighlightCard}>
         <Text style={styles.homeHighlightTitle}>Visão geral</Text>
+
         <Text style={styles.homeHighlightText}>
           Gerencie chamados,acompanhe atendimentos e organize a rotina técnica
           fos condomínios de forma prática.
         </Text>
       </View>
+
       <View style={styles.homeMetricsRow}>
         <View style={styles.homeMetricCard}>
-          <Text style={styles.homeMetricNumber}>12</Text>
-          <Text style={styles.homeMetricLabel}>Chamados</Text>
-      </View>
+          <Text style={styles.homeMetricNumber}>
+            {totalChamados}
+          </Text>
 
-      <View style={styles.homeMetricCard}>
-        <Text style={styles.homeMetricNumber}>05</Text>
-        <Text style={styles.homeMetricLabel}>Pendentes</Text>
+          <Text style={styles.homeMetricLabel}>
+            Chamados
+          </Text>
+        </View>
+
+        <View style={styles.homeMetricCard}>
+          <Text style={styles.homeMetricNumber}>
+            {pendentes}
+          </Text>
+
+          <Text style={styles.homeMetricLabel}>
+            Pendentes
+          </Text>
         </View>
       </View>
 
       <View style={styles.homeActionCard}>
-        <Text style={styles.homeActionTitle}>Acesso rápido</Text>
-        
+        <Text style={styles.homeActionTitle}>
+          Acesso rápido
+        </Text>
+
         <TouchableOpacity
-        style={styles.homeActionButton}
-        onPress={() => navigation.navigate('ChamadosTab')}
+          style={styles.homeActionButton}
+          onPress={() => navigation.navigate('ChamadosTab')}
         >
-          <Text style={styles.homeActionButtonText}>Ver chamados</Text>
+          <Text style={styles.homeActionButtonText}>
+            Ver chamados
+          </Text>
         </TouchableOpacity>
 
       </View>
     </ScrollView>
   )
 }
-
 
 function PerfilScreen() {
   const [usuario, setUsuario] = useState(null);
