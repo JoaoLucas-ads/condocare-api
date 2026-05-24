@@ -539,6 +539,7 @@ function DetalhesScreen({ route, navigation }) {
   const { chamado } = route.params;
   const [statusAtual, setStatusAtual] = useState(chamado.status);
   const [historico, setHistorico] = useState([]);
+  const [usuarioLogado, setUsuarioLogado] = useState(null);
 
   const statusStyle = corStatus(statusAtual);
 
@@ -568,7 +569,24 @@ function DetalhesScreen({ route, navigation }) {
   }
 
   useEffect(() => {
-    carregarHistorico();
+    async function carregarDados() {
+
+      const usuarioSalvo =
+      await AsyncStorage.getItem(
+        "usuarioLogado"
+      );
+
+      if (usuarioSalvo) {
+        setUsuarioLogado(
+          JSON.parse(usuarioSalvo)
+        );
+      }
+
+      carregarHistorico();
+    }
+
+    carregarDados();
+
   }, []);
 
   async function alterarStatus(novoStatus) {
@@ -604,19 +622,121 @@ function DetalhesScreen({ route, navigation }) {
       }
 
       setStatusAtual(novoStatus);
+
       await carregarHistorico();
 
-      Alert.alert("Sucesso", "Status atualizado com sucesso.");
+      Alert.alert(
+        "Sucesso",
+        "Status atualizado com sucesso."
+      );
 
     } catch (error) {
-      Alert.alert("Erro", "Não foi possível conectar com o servidor.");
+
+      Alert.alert(
+        "Erro",
+        "Não foi possível conectar com o servidor."
+      );
+
+    }
+  }
+
+  async function atribuirTecnicoJoao() {
+
+    if (!usuarioLogado) {
+
+      Alert.alert(
+        "Erro",
+        "Usuário não encontrado."
+      );
+
+      return;
+    }
+
+    try {
+
+      const respostaUsuarios =
+      await fetch(
+        "https://condocare-api.onrender.com/usuarios"
+      );
+
+      const usuarios =
+      await respostaUsuarios.json();
+
+      const tecnicoJoao =
+      usuarios.find(
+        item =>
+          item.email === "joao@gmail.com" &&
+          item.tipo_perfil === "Tecnico"
+      );
+
+      if (!tecnicoJoao) {
+
+        Alert.alert(
+          "Erro",
+          "João não encontrado."
+        );
+
+        return;
+      }
+
+      const resposta =
+      await fetch(
+        `https://condocare-api.onrender.com/chamados/${chamado.id}/tecnico`,
+        {
+          method:"PUT",
+
+          headers:{
+            "Content-Type":"application/json"
+          },
+
+          body:JSON.stringify({
+
+            id_tecnico_executor:
+            tecnicoJoao.id_usuario,
+
+            id_usuario:
+            usuarioLogado.id_usuario
+
+          })
+        }
+      );
+
+      const dados =
+      await resposta.json();
+
+      if(!resposta.ok){
+
+        Alert.alert(
+          "Erro",
+          dados.mensagem
+        );
+
+        return;
+      }
+
+      await carregarHistorico();
+
+      Alert.alert(
+        "Sucesso",
+        "João atribuído ao chamado"
+      );
+
+    } catch(error){
+
+      Alert.alert(
+        "Erro",
+        "Falha ao atribuir técnico"
+      );
     }
   }
 
   return (
     <ScrollView contentContainerStyle={styles.detalhesContainer}>
       <View style={styles.detalhesHeader}>
-        <Text style={styles.detalhesTitle}>Detalhes do Chamado</Text>
+        <Text style={styles.detalhesTitle}>
+          Detalhes do Chamado
+        </Text>
+
         <Text style={styles.detalhesSubtitle}>
           Visualize as informações completas da solicitação de atendimento
         </Text>
@@ -631,9 +751,12 @@ function DetalhesScreen({ route, navigation }) {
           style={[
             styles.detalhesStatus,
             {
-              backgroundColor: statusStyle.fundo,
-              color: statusStyle.texto,
-            },
+              backgroundColor:
+              statusStyle.fundo,
+
+              color:
+              statusStyle.texto
+            }
           ]}
         >
           {statusAtual}
@@ -641,42 +764,44 @@ function DetalhesScreen({ route, navigation }) {
       </View>
 
       <View style={styles.detalhesCard}>
+
         <View style={styles.detalhesBloco}>
-          <Text style={styles.detalhesLabel}>Condomínio</Text>
+          <Text style={styles.detalhesLabel}>
+            Condomínio
+          </Text>
+
           <Text style={styles.detalhesValor}>
             {chamado.condominio || "Não informado"}
           </Text>
         </View>
 
         <View style={styles.detalhesBloco}>
-          <Text style={styles.detalhesLabel}>Unidade</Text>
+          <Text style={styles.detalhesLabel}>
+            Unidade
+          </Text>
+
           <Text style={styles.detalhesValor}>
             {chamado.apartamento || "Não informado"}
           </Text>
         </View>
 
         <View style={styles.detalhesBloco}>
-          <Text style={styles.detalhesLabel}>Descrição do problema</Text>
+          <Text style={styles.detalhesLabel}>
+            Descrição do problema
+          </Text>
+
           <Text style={styles.detalhesDescricao}>
             {chamado.observacao || "Sem descrição"}
           </Text>
         </View>
+
       </View>
 
       <View style={styles.detalhesInfoCard}>
+
         <Text style={styles.detalhesInfoTitulo}>
           Informações do atendimento
         </Text>
-
-        <View style={styles.detalhesLinha}>
-          <Text style={styles.detalhesLinhaLabel}>
-            Código do chamado
-          </Text>
-
-          <Text style={styles.detalhesLinhaValor}>
-            #{chamado.id}
-          </Text>
-        </View>
 
         <View style={styles.detalhesLinha}>
           <Text style={styles.detalhesLinhaLabel}>
@@ -688,62 +813,83 @@ function DetalhesScreen({ route, navigation }) {
           </Text>
         </View>
 
-        <View style={styles.detalhesLinha}>
-          <Text style={styles.detalhesLinhaLabel}>
-            Solicitante
-          </Text>
-
-          <Text style={styles.detalhesLinhaValor}>
-            {chamado.chamadoOriginal?.solicitante?.nome || "Não informado"}
-          </Text>
-        </View>
-
-        <View style={styles.detalhesLinha}>
-          <Text style={styles.detalhesLinhaLabel}>
-            Prioridade
-          </Text>
-
-          <Text style={styles.detalhesLinhaValor}>
-            Normal
-          </Text>
-        </View>
       </View>
 
       {statusAtual !== "Finalizado" ? (
+
         <View style={styles.detalhesAcoes}>
+
+          {(usuarioLogado?.tipo_perfil ===
+          "Administrador" ||
+
+          usuarioLogado?.tipo_perfil ===
+          "Sindico") && (
+
+            <TouchableOpacity
+              style={styles.statusButtonBlue}
+              onPress={
+                atribuirTecnicoJoao
+              }
+            >
+              <Text
+                style={styles.statusButtonText}
+              >
+                Atribuir João Técnico
+              </Text>
+            </TouchableOpacity>
+
+          )}
+
           <TouchableOpacity
             style={styles.statusButton}
-            onPress={() => alterarStatus("EmAtendimento")}
+            onPress={() =>
+            alterarStatus(
+              "EmAtendimento"
+            )}
           >
-            <Text style={styles.statusButtonText}>
+            <Text
+            style={styles.statusButtonText}>
               Iniciar Atendimento
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.statusButtonBlue}
-            onPress={() => alterarStatus("Reagendado")}
+            onPress={() =>
+            alterarStatus(
+              "Reagendado"
+            )}
           >
-            <Text style={styles.statusButtonText}>
+            <Text
+            style={styles.statusButtonText}>
               Reagendar
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
             style={styles.statusButtonRed}
-            onPress={() => alterarStatus("Finalizado")}
+            onPress={() =>
+            alterarStatus(
+              "Finalizado"
+            )}
           >
-            <Text style={styles.statusButtonText}>
+            <Text
+            style={styles.statusButtonText}>
               Finalizar Chamado
             </Text>
           </TouchableOpacity>
+
         </View>
+
       ) : (
+
         <View style={styles.detalhesAcoes}>
           <Text style={styles.historicoDescricao}>
-            ✅ Chamado finalizado. Nenhuma nova alteração pode ser feita.
+            ✅ Chamado finalizado.
+            Nenhuma nova alteração pode ser feita.
           </Text>
         </View>
+
       )}
 
       <View style={styles.historicoBox}>
@@ -782,6 +928,7 @@ function DetalhesScreen({ route, navigation }) {
           ))
         )}
       </View>
+
     </ScrollView>
   );
 }
