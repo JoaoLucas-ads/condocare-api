@@ -453,6 +453,44 @@ useEffect(() => {
   )
 }
 
+function PerfilScreen() {
+  const [usuario, setUsuario] = useState(null);
+
+  useEffect(() => {
+    async function carregarUsuario() {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+
+      if (usuarioSalvo) {
+        setUsuario(JSON.parse(usuarioSalvo));
+      }
+    }
+
+    carregarUsuario();
+  }, []);
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.screenTitle}>Perfil</Text>
+      <View style={styles.card}>
+        <Text style={styles.detailLabel}>Nome</Text>
+        <Text style={styles.detailValue}>
+          {usuario?.nome || "Usuária do Sistema"}
+        </Text>
+
+        <Text style={styles.detailLabel}>Tipo de acesso</Text>
+        <Text style={styles.detailValue}>
+          {usuario?.tipo_perfil || "Administrador"}
+        </Text>
+
+        <Text style={styles.detailLabel}>E-mail</Text>
+        <Text style={styles.detailValue}>
+          {usuario?.email || "usuario@email.com"}
+        </Text>
+      </View>
+    </View>
+  );
+}
+
 function ChamadosScreen({ navigation }) {
   const [lista, setLista] = useState([]);
   const [tipoPerfil, setTipoPerfil] = useState("");
