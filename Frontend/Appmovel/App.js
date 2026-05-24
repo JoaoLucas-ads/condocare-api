@@ -607,25 +607,24 @@ function ChamadosScreen({ navigation }) {
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
-        style={{ marginTop: 12, marginBottom: 12 }}
+        contentContainerStyle={styles.filtrosContainer}
+        style={styles.filtrosScroll}
       >
         {["Todos", "Aberto", "EmAtendimento", "Reagendado", "Finalizado"].map((status) => (
           <TouchableOpacity
             key={status}
             style={[
-              styles.chamadoBadge,
-              {
-                marginRight: 8,
-                backgroundColor: filtroStatus === status ? "#F97316" : "#DBEAFE"
-              }
+              styles.filtroBotao,
+              filtroStatus === status && styles.filtroBotaoAtivo
             ]}
             onPress={() => setFiltroStatus(status)}
           >
             <Text
-              style={{
-                color: filtroStatus === status ? "#FFFFFF" : "#1D4ED8",
-                fontWeight: "700"
-              }}
+              numberOfLines={1}
+              style={[
+                styles.filtroTexto,
+                filtroStatus === status && styles.filtroTextoAtivo
+              ]}
             >
               {status}
             </Text>
@@ -2267,6 +2266,41 @@ historicoTitulo: {
   fontWeight: '800',
   color: '#1E3A8A',
   marginBottom: 14,
+},
+
+filtrosScroll: {
+  marginTop: 12,
+  marginBottom: 12,
+},
+
+filtrosContainer: {
+  paddingVertical: 8,
+  paddingRight: 30,
+},
+
+filtroBotao: {
+  marginRight: 10,
+  paddingHorizontal: 18,
+  paddingVertical: 10,
+  borderRadius: 25,
+  backgroundColor: "#DBEAFE",
+  minWidth: 115,
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+filtroBotaoAtivo: {
+  backgroundColor: "#F97316",
+},
+
+filtroTexto: {
+  color: "#1D4ED8",
+  fontWeight: "700",
+  fontSize: 13,
+},
+
+filtroTextoAtivo: {
+  color: "#FFFFFF",
 },
 
 });
