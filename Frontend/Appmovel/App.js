@@ -2288,6 +2288,8 @@ filtroBotao: {
   backgroundColor: "#DBEAFE",
   alignItems: "center",
   justifyContent: "center",
+  height: 36,
+  minWidth: 80,
 },
 
 filtroBotaoAtivo: {
