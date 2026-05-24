@@ -493,7 +493,10 @@ function PerfilScreen() {
 
 function ChamadosScreen({ navigation }) {
   const [lista, setLista] = useState([]);
+  const [listaOriginal, setListaOriginal] = useState([]);
   const [tipoPerfil, setTipoPerfil] = useState("");
+  const [busca, setBusca] = useState("");
+  const [filtroStatus, setFiltroStatus] = useState("Todos");
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
@@ -502,6 +505,10 @@ function ChamadosScreen({ navigation }) {
 
     return unsubscribe;
   }, [navigation]);
+
+  useEffect(() => {
+    aplicarFiltros();
+  }, [busca, filtroStatus, listaOriginal]);
 
   async function carregar() {
     try {
@@ -537,11 +544,36 @@ function ChamadosScreen({ navigation }) {
         chamadoOriginal: item
       }));
 
+      setListaOriginal(chamadosFormatados);
       setLista(chamadosFormatados);
 
     } catch (error) {
       Alert.alert("Erro", "Não foi possível carregar os chamados.");
     }
+  }
+
+  function aplicarFiltros() {
+    let resultado = listaOriginal;
+
+    if (filtroStatus !== "Todos") {
+      resultado = resultado.filter(
+        item => item.status === filtroStatus
+      );
+    }
+
+    if (busca.trim() !== "") {
+      const textoBusca = busca.toLowerCase();
+
+      resultado = resultado.filter(
+        item =>
+          item.titulo.toLowerCase().includes(textoBusca) ||
+          item.condominio.toLowerCase().includes(textoBusca) ||
+          item.apartamento.toLowerCase().includes(textoBusca) ||
+          item.observacao.toLowerCase().includes(textoBusca)
+      );
+    }
+
+    setLista(resultado);
   }
 
   return (
@@ -563,6 +595,43 @@ function ChamadosScreen({ navigation }) {
               : "Acompanhe as ocorrências cadastradas e o andamento dos atendimentos"}
         </Text>
       </View>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Buscar por descrição, condomínio ou unidade"
+        placeholderTextColor="#94A3B8"
+        value={busca}
+        onChangeText={setBusca}
+      />
+
+      <ScrollView
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        style={{ marginTop: 12, marginBottom: 12 }}
+      >
+        {["Todos", "Aberto", "EmAtendimento", "Reagendado", "Finalizado"].map((status) => (
+          <TouchableOpacity
+            key={status}
+            style={[
+              styles.chamadoBadge,
+              {
+                marginRight: 8,
+                backgroundColor: filtroStatus === status ? "#F97316" : "#DBEAFE"
+              }
+            ]}
+            onPress={() => setFiltroStatus(status)}
+          >
+            <Text
+              style={{
+                color: filtroStatus === status ? "#FFFFFF" : "#1D4ED8",
+                fontWeight: "700"
+              }}
+            >
+              {status}
+            </Text>
+          </TouchableOpacity>
+        ))}
+      </ScrollView>
 
       <FlatList
         data={lista}
@@ -621,7 +690,6 @@ function ChamadosScreen({ navigation }) {
     </View>
   );
 }
-
 
 function DetalhesScreen({ route, navigation }) {
   const { chamado } = route.params;
