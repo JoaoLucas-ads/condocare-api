@@ -412,10 +412,21 @@ function ChamadosScreen({ navigation }) {
 
   async function carregar() {
     try {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+      const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+
       const resposta = await fetch("https://condocare-api.onrender.com/chamados");
       const dados = await resposta.json();
 
-      const chamadosFormatados = dados.map((item) => ({
+      let chamadosFiltrados = dados;
+
+      if (usuario?.tipo_perfil === "Morador") {
+        chamadosFiltrados = dados.filter(
+          item => item.id_solicitante === usuario.id_usuario
+        );
+      }
+
+      const chamadosFormatados = chamadosFiltrados.map((item) => ({
         id: item.id_chamado.toString(),
         titulo: item.descricao_problema,
         status: item.status,
@@ -496,7 +507,6 @@ function ChamadosScreen({ navigation }) {
     </View>
   );
 }
-
 function DetalhesScreen({ route, navigation }) {
   const { chamado } = route.params;
   const [statusAtual, setStatusAtual] = useState(chamado.status);
