@@ -447,6 +447,12 @@ function ChamadosScreen({ navigation }) {
         );
       }
 
+      if (usuario?.tipo_perfil === "Tecnico") {
+        chamadosFiltrados = dados.filter(
+          item => item.id_tecnico_executor === usuario.id_usuario
+        );
+      }
+
       const chamadosFormatados = chamadosFiltrados.map((item) => ({
         id: item.id_chamado.toString(),
         titulo: item.descricao_problema,
@@ -468,13 +474,19 @@ function ChamadosScreen({ navigation }) {
     <View style={styles.chamadosContainer}>
       <View style={styles.chamadosHeader}>
         <Text style={styles.chamadosTitle}>
-          {tipoPerfil === "Morador" ? "Meus Chamados" : "Todos os Chamados"}
+          {tipoPerfil === "Morador"
+            ? "Meus Chamados"
+            : tipoPerfil === "Tecnico"
+              ? "Chamados Atribuídos"
+              : "Todos os Chamados"}
         </Text>
 
         <Text style={styles.chamadosSubtitle}>
           {tipoPerfil === "Morador"
             ? "Acompanhe as ocorrências abertas por você"
-            : "Acompanhe as ocorrências cadastradas e o andamento dos atendimentos"}
+            : tipoPerfil === "Tecnico"
+              ? "Acompanhe os chamados atribuídos ao seu atendimento"
+              : "Acompanhe as ocorrências cadastradas e o andamento dos atendimentos"}
         </Text>
       </View>
 
@@ -524,14 +536,16 @@ function ChamadosScreen({ navigation }) {
         }}
       />
 
-         <TouchableOpacity
-            style={styles.chamadoBotaoNovo}
-             onPress={() => navigation.navigate("NovoChamado")}
+      {tipoPerfil !== "Tecnico" && (
+        <TouchableOpacity
+          style={styles.chamadoBotaoNovo}
+          onPress={() => navigation.navigate("NovoChamado")}
         >
           <Text style={styles.chamadoBotaoNovoTexto}>+ Novo chamado</Text>
         </TouchableOpacity>
-      </View>
-    );
+      )}
+    </View>
+  );
 }
 
 
