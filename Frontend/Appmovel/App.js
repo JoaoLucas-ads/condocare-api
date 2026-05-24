@@ -813,6 +813,14 @@ function NovoChamadoScreen({ navigation }) {
 
       const usuario = JSON.parse(usuarioSalvo);
 
+      if (usuario.tipo_perfil === "Tecnico") {
+        Alert.alert(
+          "Acesso negado",
+          "Técnicos não podem abrir chamados. Apenas atender chamados atribuídos."
+        );
+        return;
+      }
+
       const resposta = await fetch(
         "https://condocare-api.onrender.com/chamados",
         {
@@ -841,16 +849,16 @@ function NovoChamadoScreen({ navigation }) {
 
       Vibration.vibrate(200);
 
-    Alert.alert(
-       "Sucesso",
-      "Chamado cadastrado com sucesso.",
-     [
-        {
-       text: "OK",
-       onPress: () => navigation.popToTop()
-     }
-   ]
-);
+      Alert.alert(
+        "Sucesso",
+        "Chamado cadastrado com sucesso.",
+        [
+          {
+            text: "OK",
+            onPress: () => navigation.popToTop()
+          }
+        ]
+      );
 
     } catch (error) {
       console.log(error);
@@ -944,6 +952,7 @@ function NovoChamadoScreen({ navigation }) {
     </ScrollView>
   );
 }
+
 
 function AvisosScreen() {
   return (
