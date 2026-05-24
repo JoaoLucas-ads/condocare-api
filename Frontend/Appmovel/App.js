@@ -626,58 +626,92 @@ function DetalhesScreen({ route, navigation }) {
       </View>
 
       <View style={styles.detalhesInfoCard}>
-        <Text style={styles.detalhesInfoTitulo}>Informações do atendimento</Text>
+        <Text style={styles.detalhesInfoTitulo}>
+          Informações do atendimento
+        </Text>
 
         <View style={styles.detalhesLinha}>
-          <Text style={styles.detalhesLinhaLabel}>Código do chamado</Text>
-          <Text style={styles.detalhesLinhaValor}>#{chamado.id}</Text>
+          <Text style={styles.detalhesLinhaLabel}>
+            Código do chamado
+          </Text>
+
+          <Text style={styles.detalhesLinhaValor}>
+            #{chamado.id}
+          </Text>
         </View>
 
         <View style={styles.detalhesLinha}>
-          <Text style={styles.detalhesLinhaLabel}>Técnico responsável</Text>
+          <Text style={styles.detalhesLinhaLabel}>
+            Técnico responsável
+          </Text>
+
           <Text style={styles.detalhesLinhaValor}>
             {chamado.chamadoOriginal?.tecnico_executor?.nome || "A definir"}
           </Text>
         </View>
 
         <View style={styles.detalhesLinha}>
-          <Text style={styles.detalhesLinhaLabel}>Solicitante</Text>
+          <Text style={styles.detalhesLinhaLabel}>
+            Solicitante
+          </Text>
+
           <Text style={styles.detalhesLinhaValor}>
             {chamado.chamadoOriginal?.solicitante?.nome || "Não informado"}
           </Text>
         </View>
 
         <View style={styles.detalhesLinha}>
-          <Text style={styles.detalhesLinhaLabel}>Prioridade</Text>
-          <Text style={styles.detalhesLinhaValor}>Normal</Text>
+          <Text style={styles.detalhesLinhaLabel}>
+            Prioridade
+          </Text>
+
+          <Text style={styles.detalhesLinhaValor}>
+            Normal
+          </Text>
         </View>
       </View>
 
-      <View style={styles.detalhesAcoes}>
-        <TouchableOpacity
-          style={styles.statusButton}
-          onPress={() => alterarStatus("EmAtendimento")}
-        >
-          <Text style={styles.statusButtonText}>Iniciar Atendimento</Text>
-        </TouchableOpacity>
+      {statusAtual !== "Finalizado" ? (
+        <View style={styles.detalhesAcoes}>
+          <TouchableOpacity
+            style={styles.statusButton}
+            onPress={() => alterarStatus("EmAtendimento")}
+          >
+            <Text style={styles.statusButtonText}>
+              Iniciar Atendimento
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.statusButtonBlue}
-          onPress={() => alterarStatus("Reagendado")}
-        >
-          <Text style={styles.statusButtonText}>Reagendar</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.statusButtonBlue}
+            onPress={() => alterarStatus("Reagendado")}
+          >
+            <Text style={styles.statusButtonText}>
+              Reagendar
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.statusButtonRed}
-          onPress={() => alterarStatus("Finalizado")}
-        >
-          <Text style={styles.statusButtonText}>Finalizar Chamado</Text>
-        </TouchableOpacity>
-      </View>
+          <TouchableOpacity
+            style={styles.statusButtonRed}
+            onPress={() => alterarStatus("Finalizado")}
+          >
+            <Text style={styles.statusButtonText}>
+              Finalizar Chamado
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <View style={styles.detalhesAcoes}>
+          <Text style={styles.historicoDescricao}>
+            ✅ Chamado finalizado. Nenhuma nova alteração pode ser feita.
+          </Text>
+        </View>
+      )}
 
       <View style={styles.historicoBox}>
-        <Text style={styles.historicoTitulo}>Histórico do Chamado</Text>
+        <Text style={styles.historicoTitulo}>
+          Histórico do Chamado
+        </Text>
 
         {historico.length === 0 ? (
           <Text style={styles.historicoVazio}>
@@ -713,7 +747,6 @@ function DetalhesScreen({ route, navigation }) {
     </ScrollView>
   );
 }
-
 
 function NovoChamadoScreen({ navigation }) {
   const [condominio, setCondominio] = useState('');
