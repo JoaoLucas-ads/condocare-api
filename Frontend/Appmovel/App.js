@@ -291,10 +291,14 @@ function HomeScreen({ navigation }) {
       console.log(error);
     }
   }
-
-  useEffect(() => {
+  
+useEffect(() => {
+  const unsubscribe = navigation.addListener("focus", () => {
     carregarDashboard();
-  }, []);
+  });
+
+  return unsubscribe;
+}, [navigation]);
 
   return(
     <ScrollView contentContainerStyle={styles.homeContainer}>
