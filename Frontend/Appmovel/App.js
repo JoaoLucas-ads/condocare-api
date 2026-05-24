@@ -296,6 +296,12 @@ function HomeScreen({ navigation }) {
         );
       }
 
+      if (usuario?.tipo_perfil === "Tecnico") {
+        chamadosFiltrados = dados.filter(
+       item => item.id_tecnico_executor === usuario.id_usuario
+      );
+    }
+
       setTotalChamados(chamadosFiltrados.length);
 
       const chamadosPendentes = chamadosFiltrados.filter(
