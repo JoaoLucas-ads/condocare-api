@@ -195,7 +195,13 @@ app.post("/chamados", async (req, res) => {
 app.put("/chamados/:id/status", async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, id_usuario } = req.body;
+
+    const {
+      status,
+      id_usuario,
+      laudo_tecnico,
+      observacoes
+    } = req.body;
 
     if (!status) {
       return res.status(400).json({
@@ -220,7 +226,13 @@ app.put("/chamados/:id/status", async (req, res) => {
         id_chamado: Number(id)
       },
       data: {
-        status
+        status,
+        laudo_tecnico: laudo_tecnico || chamadoAtual.laudo_tecnico,
+        observacoes: observacoes || chamadoAtual.observacoes,
+        data_finalizacao:
+          status === "Finalizado"
+            ? new Date()
+            : chamadoAtual.data_finalizacao
       }
     });
 
