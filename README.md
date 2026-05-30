@@ -170,17 +170,6 @@ Ranking dos problemas mais recorrentes registrados no sistema.
 
 ---
 
-# 📈 Melhorias Futuras
-
-* Cadastro de empresas prestadoras.
-* Vínculo entre técnicos e empresas.
-* Produtividade por empresa.
-* Exportação de relatórios.
-* Notificações em tempo real.
-* Dashboard avançado com gráficos.
-
----
-
 # 👨‍💻 Desenvolvedores
 
 * João Lucas Amaral Targino
