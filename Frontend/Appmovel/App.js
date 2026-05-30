@@ -1589,6 +1589,7 @@ function RelatoriosScreen() {
   const [finalizados, setFinalizados] = useState(0);
   const [comTecnico, setComTecnico] = useState(0);
   const [semTecnico, setSemTecnico] = useState(0);
+  const [tempoMedio, setTempoMedio] = useState("0 min");
 
   useEffect(() => {
     carregarRelatorios();
@@ -1628,6 +1629,51 @@ function RelatoriosScreen() {
         dados.filter(item => item.id_tecnico_executor === null).length
       );
 
+      const chamadosFinalizados = dados.filter(
+  item =>
+    item.status === "Finalizado" &&
+    item.data_abertura &&
+    item.data_finalizacao
+);
+
+if (chamadosFinalizados.length > 0) {
+
+  const totalMinutos = chamadosFinalizados.reduce(
+    (acumulador, chamado) => {
+
+      const abertura =
+      new Date(chamado.data_abertura);
+
+      const finalizacao =
+      new Date(chamado.data_finalizacao);
+
+      const diferencaMinutos =
+      (finalizacao - abertura) / 60000;
+
+      return acumulador + diferencaMinutos;
+
+    },
+    0
+  );
+
+  const media =
+  Math.round(
+    totalMinutos /
+    chamadosFinalizados.length
+  );
+
+  setTempoMedio(
+    `${media} min`
+  );
+
+} else {
+
+  setTempoMedio(
+    "0 min"
+  );
+
+}
+
     } catch (error) {
       Alert.alert(
         "Erro",
@@ -1645,8 +1691,8 @@ function RelatoriosScreen() {
       <Text style={styles.screenSubtitle}>
         Indicadores gerais dos chamados registrados no sistema
       </Text>
-
-      <View style={styles.homeMetricsRow}>
+ 
+     <View style={styles.homeMetricsRow}>
         <View style={styles.homeMetricCard}>
           <Text style={styles.homeMetricNumber}>
             {totalChamados}
@@ -1695,8 +1741,10 @@ function RelatoriosScreen() {
             Finalizados
           </Text>
         </View>
+        
 
-        <View style={styles.homeMetricCard}>
+
+          <View style={styles.homeMetricCard}>
           <Text style={styles.homeMetricNumber}>
             {comTecnico}
           </Text>
@@ -1704,6 +1752,20 @@ function RelatoriosScreen() {
             Com técnico
           </Text>
         </View>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.noticeTitle}>
+          SLA Médio
+        </Text>
+
+        <Text style={styles.detailValue}>
+          {tempoMedio}
+        </Text>
+
+        <Text style={styles.noticeText}>
+          Tempo médio entre abertura e finalização dos chamados.
+        </Text>
       </View>
 
       <View style={styles.card}>
@@ -1722,7 +1784,6 @@ function RelatoriosScreen() {
     </ScrollView>
   );
 }
-
 
 function DrawerNavigator({ funcLogout }) {
   return (
