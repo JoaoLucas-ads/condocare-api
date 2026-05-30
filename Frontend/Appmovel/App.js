@@ -1581,6 +1581,147 @@ options={{title:'Chamados,'}}
   );
 }
 
+function RelatoriosScreen() {
+  const [totalChamados, setTotalChamados] = useState(0);
+  const [abertos, setAbertos] = useState(0);
+  const [emAtendimento, setEmAtendimento] = useState(0);
+  const [reagendados, setReagendados] = useState(0);
+  const [finalizados, setFinalizados] = useState(0);
+  const [comTecnico, setComTecnico] = useState(0);
+  const [semTecnico, setSemTecnico] = useState(0);
+
+  useEffect(() => {
+    carregarRelatorios();
+  }, []);
+
+  async function carregarRelatorios() {
+    try {
+      const resposta = await fetch(
+        "https://condocare-api.onrender.com/chamados"
+      );
+
+      const dados = await resposta.json();
+
+      setTotalChamados(dados.length);
+
+      setAbertos(
+        dados.filter(item => item.status === "Aberto").length
+      );
+
+      setEmAtendimento(
+        dados.filter(item => item.status === "EmAtendimento").length
+      );
+
+      setReagendados(
+        dados.filter(item => item.status === "Reagendado").length
+      );
+
+      setFinalizados(
+        dados.filter(item => item.status === "Finalizado").length
+      );
+
+      setComTecnico(
+        dados.filter(item => item.id_tecnico_executor !== null).length
+      );
+
+      setSemTecnico(
+        dados.filter(item => item.id_tecnico_executor === null).length
+      );
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar os relatórios."
+      );
+    }
+  }
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.screenTitle}>
+        Relatórios
+      </Text>
+
+      <Text style={styles.screenSubtitle}>
+        Indicadores gerais dos chamados registrados no sistema
+      </Text>
+
+      <View style={styles.homeMetricsRow}>
+        <View style={styles.homeMetricCard}>
+          <Text style={styles.homeMetricNumber}>
+            {totalChamados}
+          </Text>
+          <Text style={styles.homeMetricLabel}>
+            Total
+          </Text>
+        </View>
+
+        <View style={styles.homeMetricCard}>
+          <Text style={styles.homeMetricNumber}>
+            {abertos}
+          </Text>
+          <Text style={styles.homeMetricLabel}>
+            Abertos
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.homeMetricsRow}>
+        <View style={styles.homeMetricCard}>
+          <Text style={styles.homeMetricNumber}>
+            {emAtendimento}
+          </Text>
+          <Text style={styles.homeMetricLabel}>
+            Em atendimento
+          </Text>
+        </View>
+
+        <View style={styles.homeMetricCard}>
+          <Text style={styles.homeMetricNumber}>
+            {reagendados}
+          </Text>
+          <Text style={styles.homeMetricLabel}>
+            Reagendados
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.homeMetricsRow}>
+        <View style={styles.homeMetricCard}>
+          <Text style={styles.homeMetricNumber}>
+            {finalizados}
+          </Text>
+          <Text style={styles.homeMetricLabel}>
+            Finalizados
+          </Text>
+        </View>
+
+        <View style={styles.homeMetricCard}>
+          <Text style={styles.homeMetricNumber}>
+            {comTecnico}
+          </Text>
+          <Text style={styles.homeMetricLabel}>
+            Com técnico
+          </Text>
+        </View>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.noticeTitle}>
+          Chamados sem técnico
+        </Text>
+
+        <Text style={styles.detailValue}>
+          {semTecnico}
+        </Text>
+
+        <Text style={styles.noticeText}>
+          Chamados que ainda precisam ser atribuídos pela administração.
+        </Text>
+      </View>
+    </ScrollView>
+  );
+}
 
 
 function DrawerNavigator({ funcLogout }) {
@@ -1601,6 +1742,10 @@ function DrawerNavigator({ funcLogout }) {
        <Drawer.Screen
         name="Perfil"
         component={PerfilScreen}
+      />
+      <Drawer.Screen
+      name="Relatórios"
+      component={RelatoriosScreen}
       />
 
       <Drawer.Screen
