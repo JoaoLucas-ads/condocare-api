@@ -1591,6 +1591,7 @@ function RelatoriosScreen() {
   const [semTecnico, setSemTecnico] = useState(0);
   const [tempoMedio, setTempoMedio] = useState("0 min");
   const [produtividade, setProdutividade] = useState([]);
+  const [recorrencias, setRecorrencias] = useState([]);
 
   useEffect(() => {
     carregarRelatorios();
@@ -1706,6 +1707,31 @@ function RelatoriosScreen() {
         produtividadeArray
       );
 
+      const recorrenciaMap = {};
+
+      dados.forEach((item) => {
+        const descricao = item.descricao_problema || "Não informado";
+
+        const categoria = descricao.includes("-")
+          ? descricao.split("-")[0].trim()
+          : descricao.trim();
+
+        recorrenciaMap[categoria] =
+          (recorrenciaMap[categoria] || 0) + 1;
+      });
+
+      const recorrenciaArray =
+      Object.entries(recorrenciaMap)
+        .map(([categoria, quantidade]) => ({
+          categoria,
+          quantidade
+        }))
+        .sort((a, b) => b.quantidade - a.quantidade);
+
+      setRecorrencias(
+        recorrenciaArray
+      );
+
     } catch (error) {
       Alert.alert(
         "Erro",
@@ -1814,6 +1840,27 @@ function RelatoriosScreen() {
               style={styles.detailValue}
             >
               {item.nome}: {item.quantidade} chamado(s)
+            </Text>
+          ))
+        )}
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.noticeTitle}>
+          Principais Defeitos
+        </Text>
+
+        {recorrencias.length === 0 ? (
+          <Text style={styles.noticeText}>
+            Nenhum chamado registrado.
+          </Text>
+        ) : (
+          recorrencias.map((item, index) => (
+            <Text
+              key={index}
+              style={styles.detailValue}
+            >
+              {index + 1}º {item.categoria}: {item.quantidade} chamado(s)
             </Text>
           ))
         )}
