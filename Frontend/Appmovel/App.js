@@ -705,6 +705,8 @@ function DetalhesScreen({ route, navigation }) {
   const [statusAtual, setStatusAtual] = useState(chamado.status);
   const [historico, setHistorico] = useState([]);
   const [usuarioLogado, setUsuarioLogado] = useState(null);
+  const [laudoTecnico, setLaudoTecnico] = useState(chamado.chamadoOriginal?.laudo_tecnico || "");
+  const [observacoesLaudo, setObservacoesLaudo] = useState(chamado.chamadoOriginal?.observacoes || "");
 
   const [tecnicoNome, setTecnicoNome] = useState(
     chamado.chamadoOriginal?.tecnico_executor?.nome ||
@@ -730,7 +732,6 @@ function DetalhesScreen({ route, navigation }) {
       );
 
       const dados = await resposta.json();
-
       setHistorico(dados);
 
     } catch (error) {
@@ -739,192 +740,165 @@ function DetalhesScreen({ route, navigation }) {
   }
 
   useEffect(() => {
-
     async function carregarDados() {
-
-      const usuarioSalvo =
-      await AsyncStorage.getItem(
-        "usuarioLogado"
-      );
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
 
       if (usuarioSalvo) {
-
-        setUsuarioLogado(
-          JSON.parse(usuarioSalvo)
-        );
+        setUsuarioLogado(JSON.parse(usuarioSalvo));
       }
 
       carregarHistorico();
     }
 
     carregarDados();
-
   }, []);
 
   async function alterarStatus(novoStatus) {
-
     try {
-
-      const usuarioSalvo =
-      await AsyncStorage.getItem(
-        "usuarioLogado"
-      );
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
 
       if (!usuarioSalvo) {
-
-        Alert.alert(
-          "Erro",
-          "Usuário não encontrado."
-        );
-
+        Alert.alert("Erro", "Usuário não encontrado.");
         return;
       }
 
-      const usuario =
-      JSON.parse(usuarioSalvo);
+      const usuario = JSON.parse(usuarioSalvo);
 
-      const resposta =
-      await fetch(
+      const resposta = await fetch(
         `https://condocare-api.onrender.com/chamados/${chamado.id}/status`,
         {
           method:"PUT",
-
           headers:{
             "Content-Type":"application/json"
           },
-
           body:JSON.stringify({
             status:novoStatus,
-            id_usuario:
-            usuario.id_usuario
+            id_usuario: usuario.id_usuario
           })
         }
       );
 
-      const dados =
-      await resposta.json();
+      const dados = await resposta.json();
 
       if(!resposta.ok){
-
-        Alert.alert(
-          "Erro",
-          dados.mensagem
-        );
-
+        Alert.alert("Erro", dados.mensagem);
         return;
       }
 
-      setStatusAtual(
-        novoStatus
-      );
-
+      setStatusAtual(novoStatus);
       await carregarHistorico();
 
-      Alert.alert(
-        "Sucesso",
-        "Status atualizado"
-      );
+      Alert.alert("Sucesso", "Status atualizado");
 
     } catch(error){
-
-      Alert.alert(
-        "Erro",
-        "Não foi possível conectar."
-      );
+      Alert.alert("Erro", "Não foi possível conectar.");
     }
   }
 
-  async function atribuirTecnicoJoao() {
-
-    if (!usuarioLogado) {
-
+  async function finalizarComLaudo() {
+    if (!laudoTecnico || !observacoesLaudo) {
       Alert.alert(
-        "Erro",
-        "Usuário não encontrado."
+        "Atenção",
+        "Preencha o laudo técnico e as observações antes de finalizar."
       );
-
       return;
     }
 
     try {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
 
-      const respostaUsuarios =
-      await fetch(
+      if (!usuarioSalvo) {
+        Alert.alert("Erro", "Usuário não encontrado.");
+        return;
+      }
+
+      const usuario = JSON.parse(usuarioSalvo);
+
+      const resposta = await fetch(
+        `https://condocare-api.onrender.com/chamados/${chamado.id}/status`,
+        {
+          method:"PUT",
+          headers:{
+            "Content-Type":"application/json"
+          },
+          body:JSON.stringify({
+            status:"Finalizado",
+            id_usuario: usuario.id_usuario,
+            laudo_tecnico: laudoTecnico,
+            observacoes: observacoesLaudo
+          })
+        }
+      );
+
+      const dados = await resposta.json();
+
+      if(!resposta.ok){
+        Alert.alert("Erro", dados.mensagem);
+        return;
+      }
+
+      setStatusAtual("Finalizado");
+      await carregarHistorico();
+
+      Alert.alert("Sucesso", "Chamado finalizado com laudo técnico.");
+
+    } catch(error){
+      Alert.alert("Erro", "Não foi possível finalizar o chamado.");
+    }
+  }
+
+  async function atribuirTecnicoJoao() {
+    if (!usuarioLogado) {
+      Alert.alert("Erro", "Usuário não encontrado.");
+      return;
+    }
+
+    try {
+      const respostaUsuarios = await fetch(
         "https://condocare-api.onrender.com/usuarios"
       );
 
-      const usuarios =
-      await respostaUsuarios.json();
+      const usuarios = await respostaUsuarios.json();
 
-      const tecnicoJoao =
-      usuarios.find(
+      const tecnicoJoao = usuarios.find(
         item =>
         item.email==="joao@gmail.com" &&
         item.tipo_perfil==="Tecnico"
       );
 
       if(!tecnicoJoao){
-
-        Alert.alert(
-          "Erro",
-          "João não encontrado."
-        );
-
+        Alert.alert("Erro", "João não encontrado.");
         return;
       }
 
-      const resposta =
-      await fetch(
+      const resposta = await fetch(
         `https://condocare-api.onrender.com/chamados/${chamado.id}/tecnico`,
         {
           method:"PUT",
-
           headers:{
             "Content-Type":"application/json"
           },
-
           body:JSON.stringify({
-
-            id_tecnico_executor:
-            tecnicoJoao.id_usuario,
-
-            id_usuario:
-            usuarioLogado.id_usuario
-
+            id_tecnico_executor: tecnicoJoao.id_usuario,
+            id_usuario: usuarioLogado.id_usuario
           })
         }
       );
 
-      const dados =
-      await resposta.json();
+      const dados = await resposta.json();
 
       if(!resposta.ok){
-
-        Alert.alert(
-          "Erro",
-          dados.mensagem
-        );
-
+        Alert.alert("Erro", dados.mensagem);
         return;
       }
 
       await carregarHistorico();
+      setTecnicoNome(tecnicoJoao.nome);
 
-      setTecnicoNome(
-        tecnicoJoao.nome
-      );
-
-      Alert.alert(
-        "Sucesso",
-        "João atribuído ao chamado"
-      );
+      Alert.alert("Sucesso", "João atribuído ao chamado");
 
     } catch(error){
-
-      Alert.alert(
-        "Erro",
-        "Falha ao atribuir técnico"
-      );
+      Alert.alert("Erro", "Falha ao atribuir técnico");
     }
   }
 
@@ -950,11 +924,8 @@ function DetalhesScreen({ route, navigation }) {
           style={[
             styles.detalhesStatus,
             {
-              backgroundColor:
-              statusStyle.fundo,
-
-              color:
-              statusStyle.texto
+              backgroundColor: statusStyle.fundo,
+              color: statusStyle.texto
             }
           ]}
         >
@@ -963,7 +934,6 @@ function DetalhesScreen({ route, navigation }) {
       </View>
 
       <View style={styles.detalhesInfoCard}>
-
         <Text style={styles.detalhesInfoTitulo}>
           Informações do atendimento
         </Text>
@@ -977,16 +947,13 @@ function DetalhesScreen({ route, navigation }) {
             {tecnicoNome}
           </Text>
         </View>
-
       </View>
 
       {statusAtual !== "Finalizado" ? (
-
         <View style={styles.detalhesAcoes}>
 
           {(usuarioLogado?.tipo_perfil==="Administrador" ||
           usuarioLogado?.tipo_perfil==="Sindico") && (
-
             <TouchableOpacity
               style={styles.statusButtonBlue}
               onPress={atribuirTecnicoJoao}
@@ -995,17 +962,13 @@ function DetalhesScreen({ route, navigation }) {
                 Atribuir João Técnico
               </Text>
             </TouchableOpacity>
-
           )}
 
           {usuarioLogado?.tipo_perfil==="Tecnico" && (
             <>
               <TouchableOpacity
                 style={styles.statusButton}
-                onPress={()=>
-                alterarStatus(
-                  "EmAtendimento"
-                )}
+                onPress={() => alterarStatus("EmAtendimento")}
               >
                 <Text style={styles.statusButtonText}>
                   Iniciar Atendimento
@@ -1014,22 +977,44 @@ function DetalhesScreen({ route, navigation }) {
 
               <TouchableOpacity
                 style={styles.statusButtonBlue}
-                onPress={()=>
-                alterarStatus(
-                  "Reagendado"
-                )}
+                onPress={() => alterarStatus("Reagendado")}
               >
                 <Text style={styles.statusButtonText}>
                   Reagendar
                 </Text>
               </TouchableOpacity>
 
+              <View style={styles.card}>
+                <Text style={styles.inputLabel}>
+                  Laudo técnico
+                </Text>
+
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Descreva o defeito encontrado"
+                  placeholderTextColor="#94A3B8"
+                  multiline
+                  value={laudoTecnico}
+                  onChangeText={setLaudoTecnico}
+                />
+
+                <Text style={styles.inputLabel}>
+                  Observações
+                </Text>
+
+                <TextInput
+                  style={[styles.input, styles.textArea]}
+                  placeholder="Informe a solução aplicada ou observações"
+                  placeholderTextColor="#94A3B8"
+                  multiline
+                  value={observacoesLaudo}
+                  onChangeText={setObservacoesLaudo}
+                />
+              </View>
+
               <TouchableOpacity
                 style={styles.statusButtonRed}
-                onPress={()=>
-                alterarStatus(
-                  "Finalizado"
-                )}
+                onPress={finalizarComLaudo}
               >
                 <Text style={styles.statusButtonText}>
                   Finalizar Chamado
@@ -1039,15 +1024,30 @@ function DetalhesScreen({ route, navigation }) {
           )}
 
         </View>
-
       ) : (
-
         <View style={styles.detalhesAcoes}>
           <Text style={styles.historicoDescricao}>
             ✅ Chamado finalizado.
           </Text>
-        </View>
 
+          <View style={styles.card}>
+            <Text style={styles.detailLabel}>
+              Laudo técnico
+            </Text>
+
+            <Text style={styles.detailValue}>
+              {laudoTecnico || "Nenhum laudo informado"}
+            </Text>
+
+            <Text style={styles.detailLabel}>
+              Observações
+            </Text>
+
+            <Text style={styles.detailValue}>
+              {observacoesLaudo || "Nenhuma observação informada"}
+            </Text>
+          </View>
+        </View>
       )}
 
       <View style={styles.historicoBox}>
@@ -1056,15 +1056,11 @@ function DetalhesScreen({ route, navigation }) {
         </Text>
 
         {historico.length===0 ? (
-
           <Text style={styles.historicoVazio}>
             Nenhum histórico registrado ainda.
           </Text>
-
         ) : (
-
           historico.map((item)=>(
-
             <View
               key={item.id_historico}
               style={styles.historicoItem}
@@ -1074,9 +1070,7 @@ function DetalhesScreen({ route, navigation }) {
               </Text>
 
               <Text style={styles.historicoTexto}>
-                {textoHistorico(
-                  item.status_novo
-                )}
+                {textoHistorico(item.status_novo)}
               </Text>
 
               <Text style={styles.historicoDescricao}>
@@ -1089,11 +1083,8 @@ function DetalhesScreen({ route, navigation }) {
                 🕒 {new Date(item.data_acao).toLocaleString()}
               </Text>
             </View>
-
           ))
-
         )}
-
       </View>
 
     </ScrollView>
