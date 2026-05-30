@@ -1590,6 +1590,7 @@ function RelatoriosScreen() {
   const [comTecnico, setComTecnico] = useState(0);
   const [semTecnico, setSemTecnico] = useState(0);
   const [tempoMedio, setTempoMedio] = useState("0 min");
+  const [produtividade, setProdutividade] = useState([]);
 
   useEffect(() => {
     carregarRelatorios();
@@ -1630,49 +1631,80 @@ function RelatoriosScreen() {
       );
 
       const chamadosFinalizados = dados.filter(
-  item =>
-    item.status === "Finalizado" &&
-    item.data_abertura &&
-    item.data_finalizacao
-);
+        item =>
+          item.status === "Finalizado" &&
+          item.data_abertura &&
+          item.data_finalizacao
+      );
 
-if (chamadosFinalizados.length > 0) {
+      if (chamadosFinalizados.length > 0) {
 
-  const totalMinutos = chamadosFinalizados.reduce(
-    (acumulador, chamado) => {
+        const totalMinutos = chamadosFinalizados.reduce(
+          (acumulador, chamado) => {
 
-      const abertura =
-      new Date(chamado.data_abertura);
+            const abertura =
+            new Date(chamado.data_abertura);
 
-      const finalizacao =
-      new Date(chamado.data_finalizacao);
+            const finalizacao =
+            new Date(chamado.data_finalizacao);
 
-      const diferencaMinutos =
-      (finalizacao - abertura) / 60000;
+            const diferencaMinutos =
+            (finalizacao - abertura) / 60000;
 
-      return acumulador + diferencaMinutos;
+            return acumulador + diferencaMinutos;
 
-    },
-    0
-  );
+          },
+          0
+        );
 
-  const media =
-  Math.round(
-    totalMinutos /
-    chamadosFinalizados.length
-  );
+        const media =
+        Math.round(
+          totalMinutos /
+          chamadosFinalizados.length
+        );
 
-  setTempoMedio(
-    `${media} min`
-  );
+        setTempoMedio(
+          `${media} min`
+        );
 
-} else {
+      } else {
 
-  setTempoMedio(
-    "0 min"
-  );
+        setTempoMedio(
+          "0 min"
+        );
 
-}
+      }
+
+      const chamadosFinalizadosComTecnico = dados.filter(
+        item =>
+          item.status === "Finalizado" &&
+          item.tecnico_executor
+      );
+
+      const produtividadeMap = {};
+
+      chamadosFinalizadosComTecnico.forEach((item) => {
+
+        const nomeTecnico =
+        item.tecnico_executor?.nome ||
+        "Sem técnico";
+
+        produtividadeMap[nomeTecnico] =
+        (produtividadeMap[nomeTecnico] || 0) + 1;
+
+      });
+
+      const produtividadeArray =
+      Object.entries(produtividadeMap).map(
+        ([nome, quantidade]) => ({
+          nome,
+          quantidade
+        })
+      );
+
+      setProdutividade(
+        produtividadeArray
+      );
 
     } catch (error) {
       Alert.alert(
@@ -1692,7 +1724,7 @@ if (chamadosFinalizados.length > 0) {
         Indicadores gerais dos chamados registrados no sistema
       </Text>
  
-     <View style={styles.homeMetricsRow}>
+      <View style={styles.homeMetricsRow}>
         <View style={styles.homeMetricCard}>
           <Text style={styles.homeMetricNumber}>
             {totalChamados}
@@ -1741,10 +1773,8 @@ if (chamadosFinalizados.length > 0) {
             Finalizados
           </Text>
         </View>
-        
 
-
-          <View style={styles.homeMetricCard}>
+        <View style={styles.homeMetricCard}>
           <Text style={styles.homeMetricNumber}>
             {comTecnico}
           </Text>
@@ -1766,6 +1796,27 @@ if (chamadosFinalizados.length > 0) {
         <Text style={styles.noticeText}>
           Tempo médio entre abertura e finalização dos chamados.
         </Text>
+      </View>
+
+      <View style={styles.card}>
+        <Text style={styles.noticeTitle}>
+          Produtividade por Técnico
+        </Text>
+
+        {produtividade.length === 0 ? (
+          <Text style={styles.noticeText}>
+            Nenhum atendimento finalizado.
+          </Text>
+        ) : (
+          produtividade.map((item, index) => (
+            <Text
+              key={index}
+              style={styles.detailValue}
+            >
+              {item.nome}: {item.quantidade} chamado(s)
+            </Text>
+          ))
+        )}
       </View>
 
       <View style={styles.card}>
