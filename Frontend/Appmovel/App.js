@@ -1786,6 +1786,19 @@ if (chamadosFinalizados.length > 0) {
 }
 
 function DrawerNavigator({ funcLogout }) {
+
+    const [usuarioLogado, setUsuarioLogado] = useState(null);
+    useEffect(() => {
+    async function carregarUsuario() {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+
+      if (usuarioSalvo) {
+        setUsuarioLogado(JSON.parse(usuarioSalvo));
+      }
+    }
+
+    carregarUsuario();
+  }, []);
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -1804,10 +1817,13 @@ function DrawerNavigator({ funcLogout }) {
         name="Perfil"
         component={PerfilScreen}
       />
-      <Drawer.Screen
-      name="Relatórios"
+     {(usuarioLogado?.tipo_perfil === "Administrador" ||
+     usuarioLogado?.tipo_perfil === "Sindico") && (
+     <Drawer.Screen
+     name="Relatórios"
       component={RelatoriosScreen}
-      />
+    />
+   )}
 
       <Drawer.Screen
         name="Configurações"
