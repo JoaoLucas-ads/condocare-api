@@ -383,19 +383,24 @@ app.get("/empresas/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    const empresa = await prisma.empresaPrestadora.findUnique({
-      where: {
-        id_empresa: Number(id)
-      }
-    });
+    const empresas = await prisma.$queryRaw`
+      SELECT 
+        id_empresa,
+        nome_fantasia,
+        cnpj,
+        especialidade,
+        frequencia_visita
+      FROM empresas_prestadoras
+      WHERE id_empresa = ${Number(id)}
+    `;
 
-    if (!empresa) {
+    if (empresas.length === 0) {
       return res.status(404).json({
         mensagem: "Empresa não encontrada"
       });
     }
 
-    res.json(empresa);
+    res.json(empresas[0]);
 
   } catch (error) {
     res.status(500).json({
