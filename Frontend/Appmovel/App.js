@@ -1890,6 +1890,60 @@ function RelatoriosScreen() {
   );
 }
 
+function AgendaScreen() {
+  const eventos = [
+    {
+      data: "03/06/2026",
+      horario: "09:00",
+      titulo: "Revisão de Interfone",
+      local: "Bloco A"
+    },
+    {
+      data: "05/06/2026",
+      horario: "14:00",
+      titulo: "Inspeção Hidráulica",
+      local: "Bloco B"
+    },
+    {
+      data: "08/06/2026",
+      horario: "10:00",
+      titulo: "Manutenção Elétrica",
+      local: "Bloco C"
+    }
+  ];
+
+  return (
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.screenTitle}>
+        Agenda
+      </Text>
+
+      <Text style={styles.screenSubtitle}>
+        Próximas manutenções programadas
+      </Text>
+
+      {eventos.map((item, index) => (
+        <View
+          key={index}
+          style={styles.card}
+        >
+          <Text style={styles.noticeTitle}>
+            📅 {item.titulo}
+          </Text>
+
+          <Text style={styles.detailValue}>
+            {item.data} às {item.horario}
+          </Text>
+
+          <Text style={styles.noticeText}>
+            Local: {item.local}
+          </Text>
+        </View>
+      ))}
+    </ScrollView>
+  );
+}
+
 function DrawerNavigator({ funcLogout }) {
 
     const [usuarioLogado, setUsuarioLogado] = useState(null);
@@ -1929,6 +1983,11 @@ function DrawerNavigator({ funcLogout }) {
       component={RelatoriosScreen}
     />
    )}
+
+        <Drawer.Screen
+        name="Agenda"
+        component={AgendaScreen}
+      />
 
       <Drawer.Screen
         name="Configurações"
