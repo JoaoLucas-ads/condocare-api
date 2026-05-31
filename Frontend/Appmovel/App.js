@@ -1346,9 +1346,11 @@ function AvisosScreen() {
   const [avisos, setAvisos] = useState([]);
 
   useEffect(() => {
+    carregarAvisos();
+  }, []);
 
-    async function carregarAvisos() {
-
+  async function carregarAvisos() {
+    try {
       const usuarioSalvo =
       await AsyncStorage.getItem(
         "usuarioLogado"
@@ -1359,91 +1361,127 @@ function AvisosScreen() {
       ? JSON.parse(usuarioSalvo)
       : null;
 
-      let listaAvisos=[];
+      const resposta =
+      await fetch(
+        "https://condocare-api.onrender.com/chamados"
+      );
 
-      if(
-      usuario?.tipo_perfil===
-      "Tecnico"
-      ){
+      const dados =
+      await resposta.json();
 
-        listaAvisos=[
+      let chamadosFiltrados =
+      dados;
 
-        {
-          titulo:
-          "🔔 Novo chamado atribuído",
-
-          texto:
-          "Você possui chamados atribuídos para atendimento."
-        },
-
-        {
-          titulo:
-          "📅 Agenda técnica",
-
-          texto:
-          "Verifique os atendimentos pendentes."
-        }
-
-        ];
+      if (
+        usuario?.tipo_perfil ===
+        "Morador"
+      ) {
+        chamadosFiltrados =
+        dados.filter(
+          item =>
+          item.id_solicitante ===
+          usuario.id_usuario
+        );
       }
 
-      else if(
-      usuario?.tipo_perfil===
-      "Morador"
-      ){
-
-        listaAvisos=[
-
-        {
-          titulo:
-          "📢 Acompanhe seu chamado",
-
-          texto:
-          "Veja o andamento das suas solicitações."
-        },
-
-        {
-          titulo:
-          "🏢 Manutenção preventiva",
-
-          texto:
-          "Haverá visita técnica quarta-feira às 14h."
-        }
-
-        ];
+      if (
+        usuario?.tipo_perfil ===
+        "Tecnico"
+      ) {
+        chamadosFiltrados =
+        dados.filter(
+          item =>
+          item.id_tecnico_executor ===
+          usuario.id_usuario
+        );
       }
 
-      else{
+      const listaAvisos =
+      chamadosFiltrados.slice(0, 6).map(
+        item => {
 
-        listaAvisos=[
+          let titulo =
+          "🔔 Atualização de chamado";
 
-        {
-          titulo:
-          "👨‍💼 Painel administrativo",
+          let texto =
+          item.descricao_problema;
 
-          texto:
-          "Existem chamados aguardando gerenciamento."
-        },
+          if (
+            item.status ===
+            "Aberto"
+          ) {
+            titulo =
+            "🟢 Novo chamado aberto";
 
-        {
-          titulo:
-          "⚙ Atualização do sistema",
+            texto =
+            `${item.descricao_problema} aguardando atendimento.`;
+          }
 
-          texto:
-          "Novas funcionalidades foram adicionadas."
+          if (
+            item.status ===
+            "EmAtendimento"
+          ) {
+            titulo =
+            "🔵 Chamado em atendimento";
+
+            texto =
+            `${item.descricao_problema} está em execução.`;
+          }
+
+          if (
+            item.status ===
+            "Reagendado"
+          ) {
+            titulo =
+            "🟡 Chamado reagendado";
+
+            texto =
+            `${item.descricao_problema} foi reagendado para a agenda técnica.`;
+          }
+
+          if (
+            item.status ===
+            "Finalizado"
+          ) {
+            titulo =
+            "✅ Chamado finalizado";
+
+            texto =
+            `${item.descricao_problema} foi finalizado com laudo técnico.`;
+          }
+
+          return {
+            titulo,
+            texto
+          };
         }
+      );
 
-        ];
+      if (
+        listaAvisos.length === 0
+      ) {
+        setAvisos([
+          {
+            titulo:
+            "📭 Nenhuma notificação",
+
+            texto:
+            "Não há atualizações de chamados no momento."
+          }
+        ]);
+      } else {
+        setAvisos(
+          listaAvisos
+        );
       }
 
-      setAvisos(
-      listaAvisos
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar os avisos."
       );
     }
-
-    carregarAvisos();
-
-  },[]);
+  }
 
   return (
     <View style={styles.container}>
