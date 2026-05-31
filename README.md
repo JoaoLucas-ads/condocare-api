@@ -172,18 +172,17 @@ Ranking dos problemas mais recorrentes registrados no sistema.
 
 ## 👨‍💻 Desenvolvedores
 
-### João Lucas Amaral Targino
-**Frontend Mobile • Backend • Banco de Dados**
+**João Lucas Amaral Targino**  
+Frontend Mobile • Backend • Banco de Dados
 
-### Vitor Lucas da Costa Costilha
-**Backend**
+**Vitor Lucas da Costa Costilha**  
+Backend
 
-### Thayna Rodrigues Rocha Calheiros
-**Frontend • UI/UX**
+**Thayna Rodrigues Rocha Calheiros**  
+Frontend • UI/UX
 
-### Gabriel Bruno Campos Bernardo Martins
-**Frontend • UI/UX**
----
+**Gabriel Bruno Campos Bernardo Martins**  
+Frontend • UI/UX
 
 # 🎓 Projeto Acadêmico
 
