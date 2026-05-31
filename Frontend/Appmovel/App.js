@@ -116,7 +116,7 @@ function LoginScreen({ navigation, route }) {
       <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
 
       <View style={styles.loginTopArea}>
-        <Text style={styles.loginBrand}>CONDOCARE</Text>
+        <Text style={styles.loginBrand}>VSAR CONDO</Text>
         <Text style={styles.loginTitle}>Acesse sua conta</Text>
         <Text style={styles.loginSubtitle}>
           Entre para gerenciar chamados e acompanhar atendimentos do condomínio.
@@ -1891,26 +1891,51 @@ function RelatoriosScreen() {
 }
 
 function AgendaScreen() {
-  const eventos = [
-    {
-      data: "03/06/2026",
-      horario: "09:00",
-      titulo: "Revisão de Interfone",
-      local: "Bloco A"
-    },
-    {
-      data: "05/06/2026",
-      horario: "14:00",
-      titulo: "Inspeção Hidráulica",
-      local: "Bloco B"
-    },
-    {
-      data: "08/06/2026",
-      horario: "10:00",
-      titulo: "Manutenção Elétrica",
-      local: "Bloco C"
+  const [eventos, setEventos] = useState([]);
+
+  useEffect(() => {
+    carregarAgenda();
+  }, []);
+
+  async function carregarAgenda() {
+    try {
+      const resposta = await fetch(
+        "https://condocare-api.onrender.com/chamados"
+      );
+
+      const dados = await resposta.json();
+
+      const chamadosAgendados = dados
+        .filter(
+          item =>
+            item.status === "Reagendado" ||
+            item.data_reagendamento
+        )
+        .map((item) => ({
+          id: item.id_chamado,
+          titulo: item.descricao_problema,
+          status: item.status,
+          data: item.data_reagendamento
+            ? new Date(item.data_reagendamento).toLocaleDateString()
+            : "Data a definir",
+          horario: item.data_reagendamento
+            ? new Date(item.data_reagendamento).toLocaleTimeString()
+            : "Horário a definir",
+          local: item.unidade
+            ? `Bloco ${item.unidade.bloco} - Unidade ${item.unidade.numero_apartamento}`
+            : "Local não informado",
+          tecnico: item.tecnico_executor?.nome || "Técnico a definir"
+        }));
+
+      setEventos(chamadosAgendados);
+
+    } catch (error) {
+      Alert.alert(
+        "Erro",
+        "Não foi possível carregar a agenda."
+      );
     }
-  ];
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -1919,27 +1944,47 @@ function AgendaScreen() {
       </Text>
 
       <Text style={styles.screenSubtitle}>
-        Próximas manutenções programadas
+        Manutenções reagendadas e próximas visitas técnicas
       </Text>
 
-      {eventos.map((item, index) => (
-        <View
-          key={index}
-          style={styles.card}
-        >
+      {eventos.length === 0 ? (
+        <View style={styles.card}>
           <Text style={styles.noticeTitle}>
-            📅 {item.titulo}
-          </Text>
-
-          <Text style={styles.detailValue}>
-            {item.data} às {item.horario}
+            Nenhuma manutenção agendada
           </Text>
 
           <Text style={styles.noticeText}>
-            Local: {item.local}
+            Os chamados reagendados aparecerão aqui automaticamente.
           </Text>
         </View>
-      ))}
+      ) : (
+        eventos.map((item) => (
+          <View
+            key={item.id}
+            style={styles.card}
+          >
+            <Text style={styles.noticeTitle}>
+              📅 {item.titulo}
+            </Text>
+
+            <Text style={styles.detailValue}>
+              {item.data} às {item.horario}
+            </Text>
+
+            <Text style={styles.noticeText}>
+              Local: {item.local}
+            </Text>
+
+            <Text style={styles.noticeText}>
+              Técnico: {item.tecnico}
+            </Text>
+
+            <Text style={styles.noticeText}>
+              Status: {item.status}
+            </Text>
+          </View>
+        ))
+      )}
     </ScrollView>
   );
 }
