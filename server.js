@@ -379,6 +379,33 @@ app.get("/limpar-usuarios-temporario", async (req, res) => {
   }
 });
 
+app.get("/empresas/:id", async (req, res) => {
+  try {
+
+    const { id } = req.params;
+
+    const empresa = await prisma.empresas_prestadoras.findUnique({
+      where: {
+        id_empresa: Number(id)
+      }
+    });
+
+    if (!empresa) {
+      return res.status(404).json({
+        mensagem: "Empresa não encontrada"
+      });
+    }
+
+    res.json(empresa);
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({
+      mensagem: "Erro ao buscar empresa"
+    });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
