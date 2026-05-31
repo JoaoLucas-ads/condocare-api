@@ -707,6 +707,8 @@ function DetalhesScreen({ route, navigation }) {
   const [usuarioLogado, setUsuarioLogado] = useState(null);
   const [laudoTecnico, setLaudoTecnico] = useState(chamado.chamadoOriginal?.laudo_tecnico || "");
   const [observacoesLaudo, setObservacoesLaudo] = useState(chamado.chamadoOriginal?.observacoes || "");
+  const [dataReagendamento, setDataReagendamento] = useState("");
+  const [horaReagendamento, setHoraReagendamento] = useState("");
 
   const [tecnicoNome, setTecnicoNome] = useState(
     chamado.chamadoOriginal?.tecnico_executor?.nome ||
@@ -794,6 +796,63 @@ function DetalhesScreen({ route, navigation }) {
       Alert.alert("Erro", "Não foi possível conectar.");
     }
   }
+
+  async function reagendarChamado() {
+  if (!dataReagendamento || !horaReagendamento) {
+    Alert.alert(
+      "Atenção",
+      "Informe a data e o horário do reagendamento."
+    );
+    return;
+  }
+
+  try {
+    const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+
+    if (!usuarioSalvo) {
+      Alert.alert("Erro", "Usuário não encontrado.");
+      return;
+    }
+
+    const usuario = JSON.parse(usuarioSalvo);
+
+    const resposta = await fetch(
+      `https://condocare-api.onrender.com/chamados/${chamado.id}/status`,
+      {
+        method:"PUT",
+        headers:{
+          "Content-Type":"application/json"
+        },
+        body:JSON.stringify({
+          status:"Reagendado",
+          id_usuario: usuario.id_usuario,
+          data_reagendamento: `${dataReagendamento}T${horaReagendamento}:00`
+        })
+      }
+    );
+
+    const dados = await resposta.json();
+
+    if(!resposta.ok){
+      Alert.alert("Erro", dados.mensagem);
+      return;
+    }
+
+    setStatusAtual("Reagendado");
+    await carregarHistorico();
+
+    Alert.alert(
+      "Sucesso",
+      "Chamado reagendado com sucesso."
+    );
+
+  } catch(error){
+    Alert.alert(
+      "Erro",
+      "Não foi possível reagendar."
+    );
+  }
+}
 
   async function finalizarComLaudo() {
     if (!laudoTecnico || !observacoesLaudo) {
@@ -975,9 +1034,33 @@ function DetalhesScreen({ route, navigation }) {
                 </Text>
               </TouchableOpacity>
 
+              <View style={styles.card}>
+               <Text style={styles.inputLabel}>
+              Data do reagendamento
+            </Text>
+
+           <TextInput
+             style={styles.input}
+             placeholder="2026-06-05"
+             value={dataReagendamento}
+            onChangeText={setDataReagendamento}
+             />
+
+           <Text style={styles.inputLabel}>
+               Horário
+               </Text>
+
+           <TextInput
+               style={styles.input}
+               placeholder="14:00"
+                 value={horaReagendamento}
+                   onChangeText={setHoraReagendamento}
+             />
+            </View>
+
               <TouchableOpacity
                 style={styles.statusButtonBlue}
-                onPress={() => alterarStatus("Reagendado")}
+                onPress={reagendarChamado}
               >
                 <Text style={styles.statusButtonText}>
                   Reagendar
