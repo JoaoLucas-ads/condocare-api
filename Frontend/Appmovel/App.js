@@ -826,7 +826,7 @@ function DetalhesScreen({ route, navigation }) {
         body:JSON.stringify({
           status:"Reagendado",
           id_usuario: usuario.id_usuario,
-          data_reagendamento: `${dataReagendamento}T${horaReagendamento}:00`
+          data_reagendamento: `${dataReagendamento}T${horaReagendamento}:00-03:00`
         })
       }
     );
@@ -2006,7 +2006,10 @@ function AgendaScreen({ navigation }) {
             ? new Date(item.data_reagendamento).toLocaleDateString()
             : "Data a definir",
           horario: item.data_reagendamento
-            ? new Date(item.data_reagendamento).toLocaleTimeString()
+            ? new Date(item.data_reagendamento).toLocaleTimeString("pt-BR", {
+            hour: "2-digit",
+            minute: "2-digit"
+        })
             : "Horário a definir",
           local: item.unidade
             ? `Bloco ${item.unidade.bloco} - Unidade ${item.unidade.numero_apartamento}`
