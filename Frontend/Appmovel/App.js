@@ -1968,7 +1968,11 @@ function AgendaScreen() {
             </Text>
 
             <Text style={styles.detailValue}>
-              {item.data} às {item.horario}
+            {item.data}
+            </Text>
+
+            <Text style={styles.noticeText}>
+             {item.horario}
             </Text>
 
             <Text style={styles.noticeText}>
