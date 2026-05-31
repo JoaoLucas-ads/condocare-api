@@ -375,7 +375,7 @@ useEffect(() => {
 
         <Text style={styles.homeHighlightText}>
           Gerencie chamados,acompanhe atendimentos e organize a rotina técnica
-          fos condomínios de forma prática.
+          dos condomínios de forma prática.
         </Text>
       </View>
 
