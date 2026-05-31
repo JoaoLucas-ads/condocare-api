@@ -455,22 +455,47 @@ useEffect(() => {
 
 function PerfilScreen() {
   const [usuario, setUsuario] = useState(null);
+  const [empresa, setEmpresa] = useState(null);
 
   useEffect(() => {
     async function carregarUsuario() {
       const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
 
       if (usuarioSalvo) {
-        setUsuario(JSON.parse(usuarioSalvo));
+        const usuarioConvertido = JSON.parse(usuarioSalvo);
+
+        setUsuario(usuarioConvertido);
+
+        if (usuarioConvertido.id_empresa) {
+          carregarEmpresa(usuarioConvertido.id_empresa);
+        }
       }
     }
 
     carregarUsuario();
   }, []);
 
+  async function carregarEmpresa(idEmpresa) {
+    try {
+      const resposta = await fetch(
+        `https://condocare-api.onrender.com/empresas/${idEmpresa}`
+      );
+
+      const dados = await resposta.json();
+
+      if (resposta.ok) {
+        setEmpresa(dados);
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.screenTitle}>Perfil</Text>
+
       <View style={styles.card}>
         <Text style={styles.detailLabel}>Nome</Text>
         <Text style={styles.detailValue}>
@@ -486,6 +511,30 @@ function PerfilScreen() {
         <Text style={styles.detailValue}>
           {usuario?.email || "usuario@email.com"}
         </Text>
+
+        {empresa && (
+          <>
+            <Text style={styles.detailLabel}>Empresa prestadora</Text>
+            <Text style={styles.detailValue}>
+              {empresa.nome_fantasia}
+            </Text>
+
+            <Text style={styles.detailLabel}>CNPJ</Text>
+            <Text style={styles.detailValue}>
+              {empresa.cnpj}
+            </Text>
+
+            <Text style={styles.detailLabel}>Especialidade</Text>
+            <Text style={styles.detailValue}>
+              {empresa.especialidade}
+            </Text>
+
+            <Text style={styles.detailLabel}>Frequência de visita</Text>
+            <Text style={styles.detailValue}>
+              {empresa.frequencia_visita}
+            </Text>
+          </>
+        )}
       </View>
     </View>
   );
