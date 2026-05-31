@@ -2115,18 +2115,21 @@ function DrawerNavigator({ funcLogout }) {
         name="Perfil"
         component={PerfilScreen}
       />
-     {(usuarioLogado?.tipo_perfil === "Administrador" ||
-     usuarioLogado?.tipo_perfil === "Sindico") && (
-     <Drawer.Screen
-     name="Relatórios"
-      component={RelatoriosScreen}
-    />
-   )}
-
-        <Drawer.Screen
-        name="Agenda"
-        component={AgendaScreen}
+       {(usuarioLogado?.tipo_perfil === "Administrador" ||
+        usuarioLogado?.tipo_perfil === "Sindico") && (
+       <Drawer.Screen
+          name="Relatórios"
+          component={RelatoriosScreen}
       />
+      )}
+      {(usuarioLogado?.tipo_perfil === "Administrador" ||
+        usuarioLogado?.tipo_perfil === "Sindico" ||
+        usuarioLogado?.tipo_perfil === "Tecnico") && (
+       <Drawer.Screen
+         name="Agenda"
+         component={AgendaScreen}
+     />
+       )}
 
       <Drawer.Screen
         name="Configurações"
