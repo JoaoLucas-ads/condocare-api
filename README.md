@@ -172,40 +172,17 @@ Ranking dos problemas mais recorrentes registrados no sistema.
 
 ## 👨‍💻 Desenvolvedores
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://github.com/SEU_GITHUB">
-        <img src="https://github.com/SEU_GITHUB.png" width="80px;" alt="João Lucas"/><br>
-        <sub><b>João Lucas Amaral</b></sub>
-      </a><br>
-      📱 Frontend Mobile<br>
-      🗄️ Banco de Dados
-    </td>
-    <td align="center">
-      <a href="https://github.com/GITHUB_VITOR">
-        <img src="https://github.com/GITHUB_VITOR.png" width="80px;" alt="Vitor"/><br>
-        <sub><b>Vitor Lucas</b></sub>
-      </a><br>
-      ⚙️ Backend
-    </td>
-    <td align="center">
-      <a href="https://github.com/GITHUB_THAYNA">
-        <img src="https://github.com/GITHUB_THAYNA.png" width="80px;" alt="Thayna"/><br>
-        <sub><b>Thayna Rodrigues</b></sub>
-      </a><br>
-      🎨 UI/UX
-    </td>
-    <td align="center">
-      <a href="https://github.com/GITHUB_GABRIEL">
-        <img src="https://github.com/GITHUB_GABRIEL.png" width="80px;" alt="Gabriel"/><br>
-        <sub><b>Gabriel Bruno</b></sub>
-      </a><br>
-      🖥️ Backend
-    </td>
-  </tr>
-</table>
+### João Lucas Amaral Targino
+**Frontend Mobile • Backend • Banco de Dados**
 
+### Vitor Lucas da Costa Costilha
+**Backend**
+
+### Thayna Rodrigues Rocha Calheiros
+**Frontend • UI/UX**
+
+### Gabriel Bruno Campos Bernardo Martins
+**Frontend • UI/UX**
 ---
 
 # 🎓 Projeto Acadêmico
