@@ -181,6 +181,17 @@ function RegistrarScreen({ navigation }) {
       Alert.alert("Atenção", "Preencha nome, e-mail e senha.");
       return;
     }
+    const emailTratado = email.trim().toLowerCase();
+
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailValido.test(emailTratado)) {
+        Alert.alert(
+          "E-mail inválido",
+          "Digite um e-mail válido. Exemplo: usuario@gmail.com"
+        );
+       return;
+    }
 
     try {
       const resposta = await fetch("https://condocare-api.onrender.com/usuarios", {
