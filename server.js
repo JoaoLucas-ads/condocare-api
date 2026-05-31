@@ -381,10 +381,9 @@ app.get("/limpar-usuarios-temporario", async (req, res) => {
 
 app.get("/empresas/:id", async (req, res) => {
   try {
-
     const { id } = req.params;
 
-    const empresa = await prisma.empresas_prestadoras.findUnique({
+    const empresa = await prisma.empresaPrestadora.findUnique({
       where: {
         id_empresa: Number(id)
       }
@@ -399,9 +398,9 @@ app.get("/empresas/:id", async (req, res) => {
     res.json(empresa);
 
   } catch (error) {
-    console.error(error);
     res.status(500).json({
-      mensagem: "Erro ao buscar empresa"
+      mensagem: "Erro ao buscar empresa",
+      erro: error.message
     });
   }
 });
