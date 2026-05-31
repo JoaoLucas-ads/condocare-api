@@ -1686,78 +1686,195 @@ function ChamadosStack() {
 }
 
 function TabsNavigator() {
-  return (
-    <Tab.Navigator
-    screenOptions={({route}) =>({
-      headerShown:false,
-      tabBarActiveTintColor:'#f97316',
-      tabBarInactiveTintColor:'#1d4ed8',
-    
-      tabBarStyle:{
-        height:72,
-        backgroundColor:'#ffffff',
-        borderTopWidth: 0,
-        marginHorizontal:14,
-        marginBottom:14,
-        borderRadius:22,
-        paddingBottom:10,
-        paddingTop:10,
+  const [quantidadeAvisos, setQuantidadeAvisos] = useState(0);
 
-        shadowColor:'#f97316',
-        shadowOpacity:0.12,
-        shadowRadius:10,
-        elevation:8,
-      },
-      tabBarLabelStyle:{
-        fontSize:12,
-        fontWeight:'700',
-        marginBottom:4,
-      },
-      tabBarIcon:({ focused,color}) => {
-        let iconName = '';
+  useEffect(() => {
+    carregarQuantidadeAvisos();
+  }, []);
 
-        if(route.name ==='HomeTab') {
-          iconName =focused
-          ? 'home'
-          : 'home-outline';
-        }
-        if (route.name === 'ChamadosTab') {
-          iconName = focused
-          ? 'document-text'
-          : 'document-text-outline';
-        }
-        if (route.name === 'Avisos') {
-          iconName =focused
-          ? 'notifications'
-          :'notifications-outline';
-        }
+  async function carregarQuantidadeAvisos() {
+    try {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+      const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
 
-        return(
-          <Ionicons
-          name={iconName}
-          size={focused ? 28 :24}
-          color={color}
-          />
+      const resposta = await fetch(
+        "https://condocare-api.onrender.com/chamados"
+      );
+
+      const dados = await resposta.json();
+
+      let chamadosFiltrados = dados;
+
+      if (usuario?.tipo_perfil === "Morador") {
+        chamadosFiltrados = dados.filter(
+          item => item.id_solicitante === usuario.id_usuario
         );
       }
-    })}
-  >
-    <Tab.Screen
-    name="HomeTab"
-    component={HomeStack}
-    options={{title:'Home,'}}
-    />
-<Tab.Screen
-name="ChamadosTab"
-component={ChamadosStack}
-options={{title:'Chamados,'}}
-/>
-<Tab.Screen
-  name="Avisos"
+
+      if (usuario?.tipo_perfil === "Tecnico") {
+        chamadosFiltrados = dados.filter(
+          item => item.id_tecnico_executor === usuario.id_usuario
+        );
+      }
+
+      const idsAvisos = chamadosFiltrados.map(
+        item => `${item.id_chamado}-${item.status}-${item.updated_at}`
+      );
+
+      const vistosSalvos = await AsyncStorage.getItem(
+        `avisosVistos_${usuario?.id_usuario}`
+      );
+
+      const avisosVistos = vistosSalvos ? JSON.parse(vistosSalvos) : [];
+
+      const naoVistos = idsAvisos.filter(
+        id => !avisosVistos.includes(id)
+      );
+
+      setQuantidadeAvisos(naoVistos.length);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async function marcarAvisosComoVistos() {
+    try {
+      const usuarioSalvo = await AsyncStorage.getItem("usuarioLogado");
+      const usuario = usuarioSalvo ? JSON.parse(usuarioSalvo) : null;
+
+      const resposta = await fetch(
+        "https://condocare-api.onrender.com/chamados"
+      );
+
+      const dados = await resposta.json();
+
+      let chamadosFiltrados = dados;
+
+      if (usuario?.tipo_perfil === "Morador") {
+        chamadosFiltrados = dados.filter(
+          item => item.id_solicitante === usuario.id_usuario
+        );
+      }
+
+      if (usuario?.tipo_perfil === "Tecnico") {
+        chamadosFiltrados = dados.filter(
+          item => item.id_tecnico_executor === usuario.id_usuario
+        );
+      }
+
+      const idsAvisos = chamadosFiltrados.map(
+        item => `${item.id_chamado}-${item.status}-${item.updated_at}`
+      );
+
+      await AsyncStorage.setItem(
+        `avisosVistos_${usuario?.id_usuario}`,
+        JSON.stringify(idsAvisos)
+      );
+
+      setQuantidadeAvisos(0);
+
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  return (
+    <Tab.Navigator
+      screenOptions={({route}) =>({
+        headerShown:false,
+        tabBarActiveTintColor:'#f97316',
+        tabBarInactiveTintColor:'#1d4ed8',
+
+        tabBarStyle:{
+          height:72,
+          backgroundColor:'#ffffff',
+          borderTopWidth: 0,
+          marginHorizontal:14,
+          marginBottom:14,
+          borderRadius:22,
+          paddingBottom:10,
+          paddingTop:10,
+
+          shadowColor:'#f97316',
+          shadowOpacity:0.12,
+          shadowRadius:10,
+          elevation:8,
+        },
+        tabBarLabelStyle:{
+          fontSize:12,
+          fontWeight:'700',
+          marginBottom:4,
+        },
+        tabBarIcon:({ focused,color}) => {
+          let iconName = '';
+
+          if(route.name ==='HomeTab') {
+            iconName =focused
+            ? 'home'
+            : 'home-outline';
+          }
+          if (route.name === 'ChamadosTab') {
+            iconName = focused
+            ? 'document-text'
+            : 'document-text-outline';
+          }
+          if (route.name === 'Avisos') {
+            iconName =focused
+            ? 'notifications'
+            :'notifications-outline';
+          }
+
+          return(
+            <Ionicons
+              name={iconName}
+              size={focused ? 28 :24}
+              color={color}
+            />
+          );
+        }
+      })}
+    >
+      <Tab.Screen
+        name="HomeTab"
+        component={HomeStack}
+        options={{title:'Home,'}}
+        listeners={{
+          focus: carregarQuantidadeAvisos
+        }}
+      />
+
+      <Tab.Screen
+        name="ChamadosTab"
+        component={ChamadosStack}
+        options={{title:'Chamados,'}}
+        listeners={{
+          focus: carregarQuantidadeAvisos
+        }}
+      />
+
+      <Tab.Screen
+        name="Avisos"
         component={AvisosScreen}
-        options={{title: 'Avisos',}}
-/>
-  </Tab.Navigator>
+        options={{
+          title: 'Avisos',
+          tabBarBadge:
+            quantidadeAvisos > 0
+            ? quantidadeAvisos
+            : undefined,
+
+          tabBarBadgeStyle:{
+            backgroundColor:"#ef4444",
+            color:"#ffffff",
+            fontSize:11,
+            fontWeight:"700"
+          }
+        }}
+        listeners={{
+          focus: marcarAvisosComoVistos
+        }}
+      />
+    </Tab.Navigator>
   );
 }
 
