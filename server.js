@@ -200,7 +200,8 @@ app.put("/chamados/:id/status", async (req, res) => {
       status,
       id_usuario,
       laudo_tecnico,
-      observacoes
+      observacoes,
+      data_reagendamento
     } = req.body;
 
     if (!status) {
@@ -229,6 +230,12 @@ app.put("/chamados/:id/status", async (req, res) => {
         status,
         laudo_tecnico: laudo_tecnico || chamadoAtual.laudo_tecnico,
         observacoes: observacoes || chamadoAtual.observacoes,
+
+        data_reagendamento:
+          status === "Reagendado" && data_reagendamento
+            ? new Date(data_reagendamento)
+            : chamadoAtual.data_reagendamento,
+
         data_finalizacao:
           status === "Finalizado"
             ? new Date()
