@@ -1340,7 +1340,6 @@ function NovoChamadoScreen({ navigation }) {
   );
 }
 
-
 function AvisosScreen() {
 
   const [avisos, setAvisos] = useState([]);
@@ -1351,6 +1350,7 @@ function AvisosScreen() {
 
   async function carregarAvisos() {
     try {
+
       const usuarioSalvo =
       await AsyncStorage.getItem(
         "usuarioLogado"
@@ -1397,7 +1397,7 @@ function AvisosScreen() {
       }
 
       const listaAvisos =
-      chamadosFiltrados.slice(0, 6).map(
+      chamadosFiltrados.map(
         item => {
 
           let titulo =
@@ -1460,68 +1460,120 @@ function AvisosScreen() {
       if (
         listaAvisos.length === 0
       ) {
-        setAvisos([
-          {
+
+        let avisoPadrao = {
+          titulo:
+          "📭 Nenhuma notificação",
+
+          texto:
+          "Não há atualizações de chamados no momento."
+        };
+
+        if (
+          usuario?.tipo_perfil ===
+          "Morador"
+        ) {
+          avisoPadrao = {
             titulo:
-            "📭 Nenhuma notificação",
+            "👋 Bem-vindo ao CondoCare",
 
             texto:
-            "Não há atualizações de chamados no momento."
-          }
-        ]);
+            "Abra seu primeiro chamado para acompanhar notificações e atualizações."
+          };
+        }
+
+        if (
+          usuario?.tipo_perfil ===
+          "Tecnico"
+        ) {
+          avisoPadrao = {
+            titulo:
+            "🔧 Nenhum atendimento atribuído",
+
+            texto:
+            "Você ainda não possui chamados atribuídos."
+          };
+        }
+
+        if (
+          usuario?.tipo_perfil ===
+          "Administrador" ||
+          usuario?.tipo_perfil ===
+          "Sindico"
+        ) {
+          avisoPadrao = {
+            titulo:
+            "📊 Nenhuma ocorrência registrada",
+
+            texto:
+            "Não existem chamados cadastrados no sistema."
+          };
+        }
+
+        setAvisos([avisoPadrao]);
+
       } else {
+
         setAvisos(
           listaAvisos
         );
+
       }
 
     } catch (error) {
+
       Alert.alert(
         "Erro",
         "Não foi possível carregar os avisos."
       );
+
     }
   }
 
- return (
-  <ScrollView
-    style={{ flex: 1 }}
-    contentContainerStyle={{
-      padding: 20,
-      paddingBottom: 120
-    }}
-    showsVerticalScrollIndicator={false}
-  >
+  return (
+    <ScrollView
+      style={{
+        flex: 1,
+        backgroundColor: "#FFFFFF"
+      }}
+      contentContainerStyle={{
+        padding: 20,
+        paddingBottom: 220,
+        flexGrow: 1
+      }}
+      showsVerticalScrollIndicator={true}
+    >
 
       <Text style={styles.screenTitle}>
         Avisos
       </Text>
 
       {avisos.map(
-      (item,index)=>(
+        (item,index)=>(
 
-      <View
-      key={index}
-      style={styles.card}
-      >
+          <View
+            key={index}
+            style={styles.card}
+          >
 
-      <Text
-      style={styles.noticeTitle}
-      >
-      {item.titulo}
-      </Text>
+            <Text
+              style={styles.noticeTitle}
+            >
+              {item.titulo}
+            </Text>
 
-      <Text
-      style={styles.noticeText}
-      >
-      {item.texto}
-      </Text>
+            <Text
+              style={styles.noticeText}
+            >
+              {item.texto}
+            </Text>
 
-      </View>
+          </View>
 
-      ))}
+        ))
+      }
 
-   </ScrollView>
+    </ScrollView>
   );
 }
 
