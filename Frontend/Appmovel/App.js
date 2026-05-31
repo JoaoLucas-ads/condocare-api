@@ -363,7 +363,7 @@ useEffect(() => {
   return(
     <ScrollView contentContainerStyle={styles.homeContainer}>
       <View style={styles.homeHeader}>
-        <Text style={styles.homeGreeting}>Bem-Vinda</Text>
+        <Text style={styles.homeGreeting}>Bem-Vindos</Text>
         <Text style={styles.homeTitle}>Painel de Controle</Text>
         <Text style={styles.homeSubtitle}>
           Acompanhe os principais dados do sistema de manutenção
