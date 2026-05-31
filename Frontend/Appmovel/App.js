@@ -112,7 +112,7 @@ function LoginScreen({ navigation, route }) {
   }
 
   return (
-    <SafeAreaView style={styles.LoginContainer}>
+    <SafeAreaView style={styles.loginContainer}>
       <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
 
       <View style={styles.loginTopArea}>
