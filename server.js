@@ -45,6 +45,14 @@ app.post("/usuarios", async (req, res) => {
       });
     }
 
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!emailValido.test(email)) {
+      return res.status(400).json({
+      mensagem: "Digite um e-mail válido."
+     });
+    }
+
     const usuarioExistente = await prisma.usuario.findUnique({
       where: { email }
     });
