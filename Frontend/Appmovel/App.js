@@ -1483,8 +1483,15 @@ function AvisosScreen() {
     }
   }
 
-  return (
-    <View style={styles.container}>
+ return (
+  <ScrollView
+    style={{ flex: 1 }}
+    contentContainerStyle={{
+      padding: 20,
+      paddingBottom: 120
+    }}
+    showsVerticalScrollIndicator={false}
+  >
 
       <Text style={styles.screenTitle}>
         Avisos
@@ -1514,7 +1521,7 @@ function AvisosScreen() {
 
       ))}
 
-    </View>
+   </ScrollView>
   );
 }
 
