@@ -1973,12 +1973,16 @@ function RelatoriosScreen() {
   );
 }
 
-function AgendaScreen() {
+function AgendaScreen({ navigation }) {
   const [eventos, setEventos] = useState([]);
 
   useEffect(() => {
+  const unsubscribe = navigation.addListener("focus", () => {
     carregarAgenda();
-  }, []);
+  });
+
+  return unsubscribe;
+}, [navigation]);
 
   async function carregarAgenda() {
     try {
